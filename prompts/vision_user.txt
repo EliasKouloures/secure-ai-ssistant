@@ -1,0 +1,3 @@
+Extract only legible typed text from this input: {filename}
+
+Return JSON only.

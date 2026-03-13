@@ -1,0 +1,10 @@
+{
+  "task_type": "absence",
+  "student_name": "Leo Martin",
+  "class_name": "Year 4B",
+  "date_from": "2026-03-12",
+  "date_to": "2026-03-12",
+  "reason": "stomach illness",
+  "status": "ready"
+}
+

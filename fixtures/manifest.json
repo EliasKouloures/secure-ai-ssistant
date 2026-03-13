@@ -1,0 +1,25 @@
+{
+  "count": 20,
+  "entries": [
+    "text/absence_full.txt",
+    "text/absence_range.txt",
+    "text/reply_general.txt",
+    "text/schedule_meeting.txt",
+    "text/triage_document.txt",
+    "text/unsupported_multi_child.txt",
+    "text/info_only_update.txt",
+    "text/contradictory_dates.txt",
+    "notes/note_missing_dates.txt",
+    "notes/note_reply_request.txt",
+    "notes/note_schedule.txt",
+    "notes/note_contradictory.txt",
+    "pdfs/pdf_absence_direct.pdf",
+    "pdfs/pdf_schedule_direct.pdf",
+    "pdfs/pdf_triage_direct.pdf",
+    "pdfs/pdf_absence_scanned.pdf",
+    "images/image_absence_clear.png",
+    "images/image_reply_clear.png",
+    "images/image_triage_clear.png",
+    "images/image_low_quality.png"
+  ]
+}

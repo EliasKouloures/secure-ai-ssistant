@@ -1,0 +1,26 @@
+Generate subject lines and message variants for this case.
+
+Task type: {task_type}
+Source summary: {source_summary}
+Facts:
+{facts_block}
+
+Warnings:
+{warnings}
+
+Missing fields:
+{missing_fields}
+
+Recommended action:
+{recommended_action}
+
+Clarifying questions:
+{clarifying_questions}
+
+Output requirements:
+- Subject lines: concise and suitable for a school office.
+- Hemingway-style: shortest, direct, active voice.
+- Corporate: polished, formal, executive-safe.
+- Educator-first: warm, clear, human.
+- Do not mention AI or model limitations.
+
