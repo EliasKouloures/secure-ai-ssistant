@@ -39,10 +39,13 @@ class ExportService:
             sections.append(f"Internal brief: {bundle.case_brief.summary}")
         if bundle.reply_set:
             sections.append("Subject lines:")
-            sections.extend(f"- {line}" for line in bundle.reply_set.subject_lines)
+            sections.extend(
+                f"{index}. Version: {line}"
+                for index, line in enumerate(bundle.reply_set.subject_lines, start=1)
+            )
             sections.append("Hemingway response:")
             sections.append(bundle.reply_set.variant_hemingway)
-            sections.append("Corporate:")
+            sections.append("Corporate response:")
             sections.append(bundle.reply_set.variant_corporate)
             sections.append("Empathic response:")
             sections.append(bundle.reply_set.variant_educator)

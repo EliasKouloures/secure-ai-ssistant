@@ -6,6 +6,7 @@ Rules:
 - Respect missing fields and placeholders.
 - Keep output calm, professional, and copy-ready.
 - Always return exactly 3 subject lines.
+- Subject lines must be plain text only, with no numbering or labels.
 - Always return message variants in this structure:
   {
     "subject_lines": ["...", "...", "..."],
@@ -15,4 +16,5 @@ Rules:
       "educator_first": "..."
     }
   }
-
+- Each message variant must be email body text only.
+- Do not include a greeting, sign-off, signature, bullet list, or markdown.

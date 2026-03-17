@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import cast
 from uuid import uuid4
@@ -18,6 +19,18 @@ from core.models import (
 )
 from core.text import strip_hidden_reasoning
 from services.backend import BackendClient
+
+SALUTATION_RE = re.compile(r"^(?:hello|dear|hi)\b[^,\n]{0,80},?\s*", re.IGNORECASE)
+SIGN_OFF_RE = re.compile(
+    r"(?:kind regards|warm regards|best regards|regards|best|sincerely|many thanks|thanks),?"
+    r"(?:\s+[A-Za-z][A-Za-z .'-]{1,80})?\s*$",
+    re.IGNORECASE,
+)
+SUBJECT_PREFIX_RE = re.compile(
+    r"^(?:\d+\.\s*version\s*:\s*|version\s*\d+\s*[:\-]\s*|\d+\s*[\).\:-]\s*)",
+    re.IGNORECASE,
+)
+SENTENCE_BREAK_RE = re.compile(r"(?<=[.!?])\s+")
 
 
 @dataclass(slots=True)
@@ -106,9 +119,9 @@ class OutputService:
         subject_values = payload.get("subject_lines", [])
         subject_items = cast(list[object], subject_values if isinstance(subject_values, list) else [])
         subject_lines = [
-            strip_hidden_reasoning(str(item)).strip()
+            self._clean_subject_line(str(item))
             for item in subject_items
-            if str(item).strip()
+            if self._clean_subject_line(str(item))
         ][:3]
         while len(subject_lines) < 3:
             subject_lines.append(self._fallback_subject_line(context, len(subject_lines)))
@@ -116,14 +129,24 @@ class OutputService:
         variants = payload.get("message_variants", {})
         if not isinstance(variants, dict):
             variants = {}
-        hemingway = strip_hidden_reasoning(
-            str(variants.get("hemingway", self._fallback_variant(context, "hemingway")))
+        hemingway = self._format_email_variant(
+            context,
+            "hemingway",
+            str(variants.get("hemingway", self._fallback_variant(context, "hemingway"))),
         )
-        corporate = strip_hidden_reasoning(
-            str(variants.get("corporate", self._fallback_variant(context, "corporate")))
+        corporate = self._format_email_variant(
+            context,
+            "corporate",
+            str(variants.get("corporate", self._fallback_variant(context, "corporate"))),
         )
-        educator = strip_hidden_reasoning(
-            str(variants.get("educator_first", self._fallback_variant(context, "educator_first")))
+        educator = self._format_email_variant(
+            context,
+            "educator_first",
+            str(
+                variants.get(
+                    "educator_first", self._fallback_variant(context, "educator_first")
+                )
+            ),
         )
 
         return ReplySet(
@@ -177,9 +200,9 @@ class OutputService:
             "Internal case brief": brief.summary,
         }
         if reply_set:
-            blocks["Subject lines"] = "\n".join(reply_set.subject_lines)
+            blocks["Subject lines"] = self._format_subject_versions(reply_set.subject_lines)
             blocks["Hemingway response"] = reply_set.variant_hemingway
-            blocks["Corporate"] = reply_set.variant_corporate
+            blocks["Corporate response"] = reply_set.variant_corporate
             blocks["Empathic response"] = reply_set.variant_educator
         if questions:
             blocks["Clarifying questions"] = "\n".join(
@@ -226,3 +249,75 @@ class OutputService:
         if context.case.reply_required:
             return "Review the drafts, edit if needed, and copy the preferred version into the school system."
         return "Review the brief and file the case without sending a reply."
+
+    def _clean_subject_line(self, value: str) -> str:
+        cleaned = strip_hidden_reasoning(value).strip()
+        cleaned = SUBJECT_PREFIX_RE.sub("", cleaned).strip()
+        return cleaned
+
+    def _format_subject_versions(self, subject_lines: list[str]) -> str:
+        return "\n".join(
+            f"{index}. Version: {line}"
+            for index, line in enumerate(subject_lines[:3], start=1)
+            if line.strip()
+        )
+
+    def _format_email_variant(self, context: OutputContext, tone: str, raw_text: str) -> str:
+        cleaned = strip_hidden_reasoning(raw_text)
+        body = self._strip_email_wrapping(cleaned)
+        if not body:
+            body = self._fallback_variant(context, tone)
+        paragraphs = self._body_paragraphs(body)
+        greeting = self._greeting(context)
+        closing = self._closing(tone)
+        parts = [greeting, *paragraphs, closing]
+        return "\n\n".join(part for part in parts if part.strip())
+
+    def _strip_email_wrapping(self, text: str) -> str:
+        cleaned = strip_hidden_reasoning(text)
+        cleaned = SALUTATION_RE.sub("", cleaned, count=1).strip()
+        cleaned = SIGN_OFF_RE.sub("", cleaned).strip(" ,")
+        cleaned = re.sub(r"\s+(?:School Office|Office Team|Administration Team)\s*$", "", cleaned, flags=re.IGNORECASE)
+        return cleaned.strip()
+
+    def _body_paragraphs(self, body: str) -> list[str]:
+        flat_body = " ".join(part.strip() for part in body.splitlines() if part.strip())
+        flat_body = re.sub(r"\s+", " ", flat_body).strip()
+        if not flat_body:
+            return []
+
+        sentences = [
+            sentence.strip()
+            for sentence in SENTENCE_BREAK_RE.split(flat_body)
+            if sentence.strip()
+        ]
+        if not sentences:
+            return [self._ensure_sentence(flat_body)]
+
+        first_paragraph = self._ensure_sentence(sentences[0])
+        remainder = " ".join(self._ensure_sentence(sentence) for sentence in sentences[1:])
+        if remainder:
+            return [first_paragraph, remainder]
+        return [first_paragraph]
+
+    def _ensure_sentence(self, value: str) -> str:
+        sentence = value.strip()
+        if not sentence:
+            return ""
+        if sentence[-1] not in ".!?":
+            sentence += "."
+        return sentence
+
+    def _greeting(self, context: OutputContext) -> str:
+        recipient = context.extracted_record.guardian_name or ""
+        if recipient and recipient != "[Not provided]":
+            return f"Hello {recipient},"
+        return "Hello,"
+
+    def _closing(self, tone: str) -> str:
+        mapping = {
+            "hemingway": "Best,",
+            "corporate": "Kind regards,",
+            "educator_first": "Warm regards,",
+        }
+        return mapping.get(tone, "Kind regards,")

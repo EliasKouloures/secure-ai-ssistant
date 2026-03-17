@@ -25,4 +25,8 @@ Output requirements:
 - Hemingway-style: shortest, direct, active voice.
 - Corporate: polished, formal, executive-safe.
 - Empathic response: warm, clear, human.
+- For each message variant, write email body text only.
+- Start with one clear bottom-line sentence.
+- Add one short supporting paragraph when useful.
+- No greeting, no signature, no bullet points, and no markdown.
 - Do not mention AI or model limitations.

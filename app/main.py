@@ -354,10 +354,14 @@ def main() -> None:
             )
 
     with right_col:
-        st.markdown('<div class="sc-panel-title">Outputs</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-panel-title">Ready-to-use outputs</div>', unsafe_allow_html=True)
         analysis = st.session_state.analysis
         outputs = st.session_state.outputs
         if analysis and outputs:
+            st.markdown(
+                '<p class="sc-muted">Pick the version that fits best, edit if needed, and copy it into your school email or admin system.</p>',
+                unsafe_allow_html=True,
+            )
             if analysis.case.status.value == "blocked":
                 st.markdown(
                     '<div class="sc-warning">Unsupported input. Review the guidance below and ask for a clearer single-child case.</div>',
@@ -394,14 +398,14 @@ def main() -> None:
             render_copy_button("Copy internal brief", brief_text)
 
             if outputs.reply_set:
-                st.subheader("Subject lines")
+                st.subheader("Subject line options")
                 subjects_text = st.text_area(
-                    "Subject lines",
-                    value="\n".join(outputs.reply_set.subject_lines),
+                    "Subject line options",
+                    value=outputs.copy_blocks["Subject lines"],
                     height=120,
                     label_visibility="collapsed",
                 )
-                render_copy_button("Copy subject lines", subjects_text)
+                render_copy_button("Copy subject line options", subjects_text)
                 variants = [
                     ("Hemingway response", outputs.reply_set.variant_hemingway),
                     ("Corporate response", outputs.reply_set.variant_corporate),
@@ -412,9 +416,9 @@ def main() -> None:
                     variant_text = st.text_area(
                         label, value=value, height=160, label_visibility="collapsed"
                     )
-                    render_copy_button(f"Copy {label}", variant_text)
+                    render_copy_button(f"Copy {label.lower()}", variant_text)
 
-            with st.expander("Exports", expanded=False):
+            with st.expander("Download case files", expanded=False):
                 for export_format in ("text", "json", "csv"):
                     content, filename = service.export_case(analysis.case.id, export_format)
                     st.download_button(
