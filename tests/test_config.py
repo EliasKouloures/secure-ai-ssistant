@@ -5,6 +5,12 @@ from pathlib import Path
 from core.config import load_config
 
 
+def test_load_config_uses_meta_llama_default_model(tmp_path: Path) -> None:
+    config = load_config(path=tmp_path / "missing-config.toml", env={})
+
+    assert config.backend.model_id == "meta-llama-3.1-8b-instruct"
+
+
 def test_load_config_reads_file_and_env_override(tmp_path: Path) -> None:
     config_path = tmp_path / "config.toml"
     config_path.write_text(

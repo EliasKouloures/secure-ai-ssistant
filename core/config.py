@@ -12,7 +12,7 @@ from typing import Any
 class BackendProfile:
     provider_name: str = "lm_studio"
     base_url: str = "http://127.0.0.1:1234/v1"
-    model_id: str = "darkidol-llama-3.1-8b-instruct-1.0-uncensored-iq-imatrix-request"
+    model_id: str = "meta-llama-3.1-8b-instruct"
     temperature: float = 0.2
     max_tokens: int = 900
     context_limit: int = 8192
@@ -123,7 +123,7 @@ def load_config(path: str | Path | None = None, env: Mapping[str, str] | None = 
     backend = BackendProfile(
         provider_name=str(backend_section.get("provider_name", "lm_studio")),
         base_url=str(backend_section.get("base_url", "http://127.0.0.1:1234/v1")),
-        model_id=str(backend_section.get("model_id", "darkidol-llama-3.1-8b-instruct-1.0-uncensored-iq-imatrix-request")),
+        model_id=str(backend_section.get("model_id", "meta-llama-3.1-8b-instruct")),
         temperature=_coerce_float(backend_section.get("temperature", 0.2)),
         max_tokens=_coerce_int(backend_section.get("max_tokens", 900)),
         context_limit=_coerce_int(backend_section.get("context_limit", 8192)),

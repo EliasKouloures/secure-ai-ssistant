@@ -8,7 +8,7 @@ database_path = "data/sekretariat.db"
 [backend]
 provider_name = "lm_studio"
 base_url = "http://127.0.0.1:1234/v1"
-model_id = "darkidol-llama-3.1-8b-instruct-1.0-uncensored-iq-imatrix-request"
+model_id = "meta-llama-3.1-8b-instruct"
 temperature = 0.2
 max_tokens = 900
 context_limit = 8192
