@@ -1,4 +1,4 @@
-# Sekretariat-Copilot
+# Sekretariat-Copilot (GER) aka Secretary Copilot (ENG)
 
 ![Sekretariat-Copilot banner](docs/assets/sekretariat-copilot-banner.png)
 
