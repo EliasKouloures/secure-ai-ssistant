@@ -42,8 +42,9 @@ class OpenAICompatibleBackend:
             headers={"Authorization": f"Bearer {self.profile.api_key}"},
         )
         warnings: list[str] = []
+        health_timeout = min(self.profile.timeout_seconds, 5)
         try:
-            with urllib.request.urlopen(request, timeout=self.profile.timeout_seconds) as response:
+            with urllib.request.urlopen(request, timeout=health_timeout) as response:
                 payload = json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             return HealthCheckResult(
@@ -142,11 +143,25 @@ class OpenAICompatibleBackend:
                 messages=messages,  # type: ignore[arg-type]
             )
         except Exception as exc:  # pragma: no cover - backend exceptions vary by provider
-            raise AppError(
-                ErrorCode.BACKEND_UNREACHABLE, f"Local model backend request failed: {exc}"
-            ) from exc
+            raise map_backend_exception(exc) from exc
 
         message = response.choices[0].message.content if response.choices else None
         if not message:
             raise AppError(ErrorCode.MODEL_TIMEOUT, "Local model backend returned no content.")
         return str(message)
+
+
+def map_backend_exception(exc: Exception) -> AppError:
+    message = str(exc).strip() or exc.__class__.__name__
+    lowered = message.lower()
+    class_name = exc.__class__.__name__.lower()
+    if "timeout" in class_name or "timed out" in lowered or "readtimeout" in lowered:
+        return AppError(
+            ErrorCode.MODEL_TIMEOUT,
+            "The local model took too long to respond. The server is running, but this request timed out. "
+            "Try again, shorten the input, or increase backend timeout settings.",
+        )
+    return AppError(
+        ErrorCode.BACKEND_UNREACHABLE,
+        f"The local model backend could not be reached: {message}",
+    )

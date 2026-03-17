@@ -4,6 +4,7 @@ import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from app.components import render_copy_button
+from app.state import apply_reset, queue_reset
 from app.styles import load_styles
 from core.config import load_config
 from core.errors import AppError
@@ -42,6 +43,7 @@ def _initialise_state() -> None:
         "pasted_text_input": "",
         "manual_note_input": "",
         "file_uploader_nonce": 0,
+        "reset_requested": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -111,20 +113,28 @@ def _clear_pending_review(service: CaseService, *, remove_pending_case: bool) ->
     st.session_state.clarification_error = None
 
 
-def _reset_ui(service: CaseService) -> None:
+def _perform_reset(service: CaseService) -> None:
     if st.session_state.case_id:
         try:
             service.reset_case(st.session_state.case_id)
         except AppError:
             pass
     _clear_pending_review(service, remove_pending_case=True)
-    st.session_state.case_id = None
-    st.session_state.analysis = None
-    st.session_state.outputs = None
-    st.session_state.error_message = None
-    st.session_state.pasted_text_input = ""
-    st.session_state.manual_note_input = ""
-    st.session_state.file_uploader_nonce += 1
+    apply_reset(st.session_state)
+
+
+def _handle_app_error(exc: AppError) -> str:
+    if exc.code == ErrorCode.BACKEND_UNREACHABLE:
+        return (
+            "The local model backend could not be reached. Please confirm that LM Studio is open, "
+            "the local server is running, and the configured model is loaded."
+        )
+    if exc.code == ErrorCode.MODEL_TIMEOUT:
+        return (
+            "The local model is running, but this request took too long to finish. "
+            "Please try again, shorten the request, or increase the backend timeout in `config.toml`."
+        )
+    return exc.message
 
 
 def _store_completed_case(analysis: AnalysisResult, outputs: GeneratedOutputs) -> None:
@@ -239,12 +249,7 @@ def render_clarification_dialog(service: CaseService) -> None:
             try:
                 _analyse_and_maybe_generate(service, updated_payload, allow_clarification=True)
             except AppError as exc:
-                if exc.code == ErrorCode.BACKEND_UNREACHABLE:
-                    st.session_state.error_message = (
-                        "The local model backend is unavailable. Start LM Studio or another compatible local server and try again."
-                    )
-                else:
-                    st.session_state.error_message = exc.message
+                st.session_state.error_message = _handle_app_error(exc)
             st.rerun()
 
 
@@ -253,6 +258,9 @@ def main() -> None:
     config = service.config
     st.markdown(load_styles(), unsafe_allow_html=True)
     _initialise_state()
+
+    if st.session_state.reset_requested:
+        _perform_reset(service)
 
     if st.session_state.show_clarification_dialog:
         render_clarification_dialog(service)
@@ -317,7 +325,7 @@ def main() -> None:
             reset = st.button("Reset case", width="stretch")
 
         if reset:
-            _reset_ui(service)
+            queue_reset(st.session_state)
             st.rerun()
 
         if process:
@@ -335,12 +343,7 @@ def main() -> None:
             except AppError as exc:
                 st.session_state.analysis = None
                 st.session_state.outputs = None
-                if exc.code == ErrorCode.BACKEND_UNREACHABLE:
-                    st.session_state.error_message = (
-                        "The local model backend is unavailable. Start LM Studio or another compatible local server and try again."
-                    )
-                else:
-                    st.session_state.error_message = exc.message
+                st.session_state.error_message = _handle_app_error(exc)
 
         if st.session_state.error_message:
             st.markdown(

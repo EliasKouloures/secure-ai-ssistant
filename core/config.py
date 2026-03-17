@@ -16,7 +16,7 @@ class BackendProfile:
     temperature: float = 0.2
     max_tokens: int = 900
     context_limit: int = 8192
-    timeout_seconds: int = 30
+    timeout_seconds: int = 120
     supports_vision: bool = False
     api_key: str = "local"
 
@@ -127,7 +127,7 @@ def load_config(path: str | Path | None = None, env: Mapping[str, str] | None = 
         temperature=_coerce_float(backend_section.get("temperature", 0.2)),
         max_tokens=_coerce_int(backend_section.get("max_tokens", 900)),
         context_limit=_coerce_int(backend_section.get("context_limit", 8192)),
-        timeout_seconds=_coerce_int(backend_section.get("timeout_seconds", 30)),
+        timeout_seconds=_coerce_int(backend_section.get("timeout_seconds", 120)),
         supports_vision=_coerce_bool(backend_section.get("supports_vision", False)),
         api_key=str(backend_section.get("api_key", "local")),
     )
