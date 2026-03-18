@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from core.models import (
+    AssistantRun,
     AuditEvent,
     Case,
     CaseBrief,
@@ -119,6 +120,20 @@ class Repository:
                     error_code TEXT,
                     metadata_json TEXT
                 );
+
+                CREATE TABLE IF NOT EXISTS assistant_runs (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    preview TEXT NOT NULL,
+                    context_text TEXT NOT NULL,
+                    prompt_title TEXT NOT NULL,
+                    prompt_body TEXT NOT NULL,
+                    output_text TEXT NOT NULL,
+                    source_files_json TEXT NOT NULL DEFAULT '[]',
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_assistant_runs_created_at ON assistant_runs (created_at DESC);
                 """
             )
 
@@ -293,6 +308,28 @@ class Repository:
                 ),
             )
 
+    def insert_assistant_run(self, run: AssistantRun) -> None:
+        with self._managed_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO assistant_runs (
+                    id, title, preview, context_text, prompt_title, prompt_body,
+                    output_text, source_files_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    run.id,
+                    run.title,
+                    run.preview,
+                    run.context_text,
+                    run.prompt_title,
+                    run.prompt_body,
+                    run.output_text,
+                    json.dumps(run.source_files),
+                    run.created_at.isoformat(),
+                ),
+            )
+
     def find_case_by_fingerprint(self, fingerprint: str) -> Case | None:
         with self._managed_connection() as conn:
             row = conn.execute(
@@ -325,6 +362,27 @@ class Repository:
             case_brief=self._row_to_case_brief(brief_row) if brief_row else None,
             clarifying_questions=[self._row_to_question(row) for row in question_rows],
         )
+
+    def list_assistant_runs(self, limit: int = 50) -> list[AssistantRun]:
+        with self._managed_connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT *
+                FROM assistant_runs
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        return [self._row_to_assistant_run(row) for row in rows]
+
+    def get_assistant_run(self, run_id: str) -> AssistantRun | None:
+        with self._managed_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM assistant_runs WHERE id = ?",
+                (run_id,),
+            ).fetchone()
+        return self._row_to_assistant_run(row) if row else None
 
     def list_recent_cases(self, limit: int = 7) -> list[DashboardCaseRow]:
         with self._managed_connection() as conn:
@@ -476,4 +534,17 @@ class Repository:
             case_id=row["case_id"],
             question_text=row["question_text"],
             priority=QuestionPriority(row["priority"]),
+        )
+
+    def _row_to_assistant_run(self, row: sqlite3.Row) -> AssistantRun:
+        return AssistantRun(
+            id=row["id"],
+            title=row["title"],
+            preview=row["preview"],
+            context_text=row["context_text"],
+            prompt_title=row["prompt_title"],
+            prompt_body=row["prompt_body"],
+            output_text=row["output_text"],
+            source_files=json.loads(row["source_files_json"] or "[]"),
+            created_at=_dt(row["created_at"]) or datetime.now(UTC),
         )

@@ -1,12 +1,13 @@
 # Windows Setup
 
-If you want the full school IT path, start with the [IT deployment guide](IT_DEPLOYMENT.md).
+If you want the full technical context, start with the [IT Deployment Guide](IT_DEPLOYMENT.md).
 
 ## Requirements
 
 - Windows 11
 - Python 3.12, 3.13, or 3.14
-- LM Studio or another OpenAI-compatible local backend
+- LM Studio
+- `meta-llama-3.1-8b-instruct` loaded in LM Studio
 
 ## Steps
 
@@ -25,41 +26,54 @@ py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-If `py -3` does not work, try:
+If `py -3` does not work:
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-4. Install the project:
+4. Install the app:
 
 ```powershell
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
-```
-
-5. Copy the example config:
-
-```powershell
 Copy-Item config.example.toml config.toml
 ```
 
-6. Start LM Studio and launch its local server.
+5. Start LM Studio and enable the local server.
+6. Load `meta-llama-3.1-8b-instruct`.
 7. Run the app:
+
+```powershell
+secure-secr-ai-tery
+```
+
+Legacy fallback:
 
 ```powershell
 sekretariat-copilot
 ```
 
-If that command is not found, run:
+Direct launcher fallback:
+
+```powershell
+.venv\Scripts\secure-secr-ai-tery.exe
+```
+
+Legacy direct launcher:
 
 ```powershell
 .venv\Scripts\sekretariat-copilot.exe
 ```
 
-## First-run check
+## First-Run Check
 
-- the top bar should show the local backend status
-- the KPI should be visible
-- you should be able to paste text and click `Process locally`
+You should be able to:
+
+- type context into `Context, Info & 2do's`
+- open the prompt menu
+- save a prompt
+- run the prompt
+- copy text from `AI Output`
+- reopen the run from `History`

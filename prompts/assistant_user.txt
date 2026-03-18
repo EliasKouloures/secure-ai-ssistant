@@ -1,0 +1,16 @@
+Selected prompt title:
+{prompt_title}
+
+Selected prompt:
+{prompt_body}
+
+Typed context, info and 2do's:
+{context_text}
+
+Uploaded file context:
+{file_context}
+
+Instructions:
+- Complete the user's request by applying the selected prompt to the context above.
+- Treat uploaded file content as supporting context.
+- If no uploaded file was provided, ignore that section.

@@ -1,151 +1,101 @@
 # IT Deployment Guide
 
-This guide is for school IT teams and technical operators.
+This guide is for school IT teams, DPO reviewers, and technical operators.
 
-It assumes you are comfortable with normal software setup, but not necessarily with local AI tooling yet.
+Secure Secr-AI-tery is a local desktop web app with:
 
-If you are a school leader, administrator, or educator, start with the main [README](../README.md) instead.
-If you need the leadership summary first, read the [School Leader Brief](SCHOOL_LEADER_BRIEF.md).
-
----
-
-## What You Are Deploying
-
-You are deploying:
-
-- a Python web app
+- a Streamlit front end
+- a Python service layer
 - a local SQLite database
-- a local model host
-- one or more local AI models
+- a local LM Studio server
+- a local model
 
-You are not deploying:
+It is **not**:
 
-- a managed SaaS platform
+- a SaaS tenant
 - an autonomous agent
-- an email-sending bot
-- a grading or admissions system
+- an email sender
+- a school MIS replacement
 
----
+## Deployment Model
 
-## Architecture at a Glance
+Recommended first deployment:
+
+1. one dedicated Mac or Windows machine
+2. one named staff account
+3. local-only binding on `127.0.0.1`
+4. LM Studio running on the same machine
+5. no intranet exposure at the start
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    A["Operator browser"] --> B["Streamlit app"]
+    A["Operator browser"] --> B["Secure Secr-AI-tery"]
     B --> C["Python services"]
     C --> D["SQLite"]
-    C --> E["LM Studio"]
-    E --> F["Local model"]
+    C --> E["LM Studio local server"]
+    E --> F["Meta Llama 3.1 8B Instruct"]
 ```
 
----
+## What Is Stored Locally
 
-## Recommended First Deployment Profile
+SQLite stores local run history so users can reopen old work:
 
-Use this for the first pilot:
+- history title
+- typed context
+- saved prompt title
+- saved prompt body
+- output text
+- uploaded file names
+- audit metadata
 
-- one dedicated Mac or Windows PC
-- one named operator account
-- LM Studio running locally
-- app bound to `127.0.0.1`
-- no intranet mode
-- synthetic fixtures first
-- real school data only after internal acceptance
+Uploaded file bodies are not required for history and should stay transient.
 
-This is the safest and simplest starting point.
+## Recommended LM Studio Model
 
----
+Use:
 
-## Technical Stack
+- `meta-llama-3.1-8b-instruct`
 
-- Python 3.12, 3.13, or 3.14
-- Streamlit UI
-- OpenAI Python SDK pointed at a local OpenAI-compatible endpoint
-- LM Studio as the default local model host
-- SQLite for local metadata and derived outputs
-- PyMuPDF for direct PDF extraction
-- Pillow for image preprocessing
+Why:
 
----
+- steadier than the uncensored variant for school-office writing
+- good balance for a 16 GB Apple Silicon machine
+- reliable for short prompt-driven drafting and summarising tasks
 
-## Before You Start
+## Recommended LM Studio Inference Settings
 
-Confirm:
+From top to bottom in LM Studio:
 
-1. The pilot machine is patched.
-2. Disk encryption is enabled.
-3. Access is limited to named staff.
-4. You know where `config.toml` and the SQLite file will live.
-5. You have decided whether the first rollout is:
-   - text only
-   - text plus digital PDFs
-   - text plus PDFs plus image OCR
+- `Preset`: save one as `Secure Secr-AI-tery Stable`
+- `System Prompt`: leave empty
+- `Temperature`: `0.2`
+- `Limit Response Length`: `Off`
+- `Context Overflow`: `Truncate Middle`
+- `Stop Strings`: leave empty
+- `CPU Threads`: `6`
+- `Top K Sampling`: `20`
+- `Repeat Penalty`: `1.05`
+- `Top P Sampling`: `0.85`
+- `Min P Sampling`: `Off`
+- `Structured Output`: `Off`
+- `Speculative Decoding`: `Off`
+- `Draft Model`: none
 
-For most schools, start with text and digital PDFs.
+These settings favour stable office writing over creativity.
 
----
-
-## Get the Repo
-
-Clone the repository:
+## Get The Repo
 
 ```bash
 git clone https://github.com/EliasKouloures/Sekretariat-Copilot.git
 cd Sekretariat-Copilot
 ```
 
-If your school does not use Git yet, download the repository as a ZIP and unpack it on the pilot machine.
+The GitHub repo name stays the same for continuity.
+The product name inside the app is now `Secure Secr-AI-tery`.
 
----
-
-## LM Studio Setup
-
-LM Studio is the reference backend for this repo.
-
-### Why LM Studio
-
-- easy desktop UI
-- Apple Silicon friendly
-- OpenAI-compatible local server
-- good beginner path for local models
-- works offline after model download
-
-### Install LM Studio
-
-1. Download LM Studio from the official site.
-2. Install the correct build.
-   - On Mac, use Apple Silicon / arm64.
-3. Open the app.
-
-### Choose a Model
-
-On a 16 GB Apple Silicon machine:
-
-- start with a small instruct model for text workflows
-- add a vision-capable model only if you need image OCR
-
-Practical advice:
-
-- text-first gives the best first impression
-- digital PDFs do not require a vision model if direct text extraction works
-- vision models need more memory and more care
-
-### Start the Local Server
-
-In LM Studio:
-
-1. Load the model.
-2. Open the `Developer` tab.
-3. Start the local server.
-4. Confirm the endpoint is `http://127.0.0.1:1234/v1`.
-
-That is the default backend target for this app.
-
----
-
-## macOS Reference Install
-
-From the repo root:
+## macOS Install
 
 ```bash
 python3 --version
@@ -156,29 +106,20 @@ python -m pip install -e '.[dev]'
 cp config.example.toml config.toml
 ```
 
-If `python3` does not work, try:
+If `python3` is not found:
 
 ```bash
 python --version
 python -m venv .venv
 ```
 
-If `sekretariat-copilot` is not found later, run:
+## Windows Install
 
-```bash
-.venv/bin/sekretariat-copilot
-```
-
----
-
-## Windows Reference Install
-
-See the full [Windows setup guide](WINDOWS_SETUP.md) for the cleanest path.
+See the dedicated [Windows Setup](WINDOWS_SETUP.md) page for the cleanest path.
 
 Fast path:
 
 ```powershell
-py --version
 py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
@@ -186,214 +127,106 @@ python -m pip install -e ".[dev]"
 Copy-Item config.example.toml config.toml
 ```
 
-If `py -3` does not exist, use:
+## Config
 
-```powershell
-python -m venv .venv
+`config.toml`:
+
+```toml
+[app]
+title = "Secure Secr-AI-tery"
+bind_host = "127.0.0.1"
+bind_port = 8501
+
+[backend]
+provider_name = "lm_studio"
+base_url = "http://127.0.0.1:1234/v1"
+model_id = "meta-llama-3.1-8b-instruct"
+temperature = 0.2
+max_tokens = 900
+timeout_seconds = 120
+supports_vision = false
 ```
 
-If the launcher is not found, use:
+Important:
 
-```powershell
-.venv\Scripts\sekretariat-copilot.exe
-```
+- `model_id` must match the loaded LM Studio server model
+- `supports_vision` should stay `false` unless you deliberately move back to OCR-capable workflows
+- `bind_host` should stay `127.0.0.1` for the first deployment
 
----
+## Launch
 
-## Configure the App
-
-Copy the example file first:
+Preferred command:
 
 ```bash
-cp config.example.toml config.toml
+secure-secr-ai-tery
 ```
 
-Important fields:
-
-- `provider_name`
-  - default is `lm_studio`
-- `base_url`
-  - usually `http://127.0.0.1:1234/v1`
-- `model_id`
-  - must match the model actually loaded in LM Studio
-- `supports_vision`
-  - `false` for text-only use
-  - `true` only if a working local vision model is loaded
-- `bind_host`
-  - keep `127.0.0.1` for the first deployment
-- `database_path`
-  - choose according to school policy and local backup rules
-
----
-
-## Run the App
+Legacy fallback:
 
 ```bash
 sekretariat-copilot
 ```
 
-Then open:
-
-```text
-http://127.0.0.1:8501
-```
-
-If needed, run the launcher directly:
+Direct path fallback:
 
 ```bash
-.venv/bin/sekretariat-copilot
+.venv/bin/secure-secr-ai-tery
 ```
 
----
+## What Operators See
 
-## First Verification
+The UI is intentionally simple:
 
-Check:
+- `History` on the left
+- `Context, Info & 2do's` in the centre
+- `AI Output` below it
+- `Prompts` and the full prompt editor on the right
 
-1. The top status pill shows the backend is reachable.
-2. The configured `model_id` matches the loaded model.
-3. The diagnostics section shows no unexpected backend errors.
-4. `Process locally` works with synthetic fixtures.
+This keeps the app understandable for non-technical staff.
 
-Recommended first fixtures:
+## First Acceptance Check
 
-- `fixtures/text/absence_full.txt`
-- `fixtures/notes/note_missing_dates.txt`
-- `fixtures/pdfs/pdf_absence_direct.pdf`
-- `fixtures/images/image_absence_clear.png`
+Confirm that the operator can:
 
-Use the image fixture only if `supports_vision = true`.
+1. open the app
+2. write context into the upper middle box
+3. upload one file if needed
+4. choose or save a prompt
+5. click `Run Prompt`
+6. copy the result from `AI Output`
+7. reopen the run from `History`
 
----
+## Governance Notes
 
-## Pilot Sequence
+This project helps with a stronger privacy posture.
+It does **not** remove the need for school-level review.
 
-Use this order:
+Check locally:
 
-1. Synthetic fixtures
-2. Low-sensitivity internal examples
-3. Real office material under local policy
+- legal basis for the intended use
+- staff guidance
+- local retention policy
+- access control for the pilot machine
+- whether a DPIA is needed for the chosen workflow scope
 
-Train staff on:
+## Practical Rollout Advice
 
-- when to use the tool
-- when not to use it
-- how to review outputs
-- how to recognise low-confidence or blocked cases
+Start narrow.
 
----
+Recommended first pilot:
 
-## Security and Governance Checklist
+1. three saved prompts only
+2. text-first work
+3. one school office owner
+4. synthetic material first
+5. short real-world test after internal sign-off
 
-Before real use, confirm:
+## Troubleshooting
 
-1. Disk encryption is enabled.
-   - FileVault on macOS
-   - BitLocker on Windows
-2. Staff use named accounts.
-3. Automatic screen lock is enabled.
-4. The workflow scope is documented.
-5. Retention for the SQLite database is defined.
-6. Human review is mandatory before any communication leaves the system.
-7. The school has checked whether a DPIA is needed.
-8. Staff know which data may and may not be entered.
+Go to [Troubleshooting](TROUBLESHOOTING.md) for:
 
----
-
-## GDPR and AI Act Notes for IT Leads
-
-This tool is positioned as a human-in-the-loop drafting and extraction assistant.
-
-That means:
-
-- no automated decisions
-- no auto-send
-- no grading
-- no behavioural monitoring
-- no admissions automation
-
-Review at minimum:
-
-- purpose
-- lawful basis
-- data categories
-- access rights
-- retention
-- device controls
-- incident path
-- local staff instructions
-
-Do not treat the local-first design as a substitute for internal review.
-Treat it as a better starting posture.
-
----
-
-## Intranet Mode
-
-This app can be exposed on a trusted local network, but that should be a second step.
-
-For the first pilot:
-
-- keep `bind_host = "127.0.0.1"`
-- keep the model host local
-- do not expose the service beyond the pilot machine
-
-If you later enable LAN access:
-
-- restrict it to a trusted subnet
-- document who can reach it
-- confirm the model host is not exposed more broadly
-- review firewall and reverse proxy controls
-
----
-
-## Troubleshooting Shortcuts
-
-### The backend is unavailable
-
-- make sure LM Studio is open
-- make sure a model is loaded
-- make sure the local server is running
-- confirm `base_url` and `model_id` in `config.toml`
-
-### PDFs work but screenshots do not
-
-- you likely do not have a vision-capable model loaded
-- set `supports_vision = false` and start with text or digital PDFs
-
-### The machine feels slow
-
-- use a smaller model
-- keep OCR disabled at first
-- begin with text-only workflows
-
-### `python3.12` is missing
-
-That is normal on many systems.
-Use `python3` if it exists.
-
-### `sekretariat-copilot` is not found
-
-Activate the virtual environment first, or run the launcher directly from `.venv`.
-
-For more, see the [Troubleshooting guide](TROUBLESHOOTING.md).
-
----
-
-## Verification Commands
-
-```bash
-ruff check .
-mypy app core services
-pytest
-```
-
----
-
-## Related Docs
-
-- [Main README](../README.md)
-- [Windows setup guide](WINDOWS_SETUP.md)
-- [Privacy note](PRIVACY.md)
-- [Troubleshooting guide](TROUBLESHOOTING.md)
-- [Demo runbook](DEMO_RUNBOOK.md)
+- LM Studio not reachable
+- wrong model loaded
+- launcher not found
+- slow generations
+- prompt library questions

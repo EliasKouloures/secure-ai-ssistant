@@ -86,3 +86,35 @@ def test_manual_note_guides_output_without_overwriting_source_analysis(case_serv
     assert "Operator note" in (analysis.extracted_record.notes or "")
     assert outputs.reply_set is not None
     assert "Mr. Nice" in outputs.reply_set.variant_corporate
+
+
+def test_run_prompt_stores_history_and_output(case_service) -> None:
+    saved_prompt = case_service.save_prompt_template(
+        "Draft a short reply in British English.",
+        selected_title="Draft a short reply",
+    )
+
+    run = case_service.run_prompt(
+        context_text="Parent wants a calm reply about lateness.",
+        prompt_title=saved_prompt.title,
+        prompt_body=saved_prompt.body,
+        files=[],
+    )
+
+    history = case_service.list_history()
+
+    assert run.title.startswith("Draft a short reply")
+    assert "Parent wants a calm reply" in run.output_text
+    assert history[0].id == run.id
+
+
+def test_run_prompt_requires_prompt_body(case_service) -> None:
+    with pytest.raises(AppError) as exc_info:
+        case_service.run_prompt(
+            context_text="Parent wants a reply.",
+            prompt_title="",
+            prompt_body="",
+            files=[],
+        )
+
+    assert exc_info.value.code == ErrorCode.INSUFFICIENT_CONTEXT

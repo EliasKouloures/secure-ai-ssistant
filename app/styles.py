@@ -17,6 +17,7 @@ def load_styles() -> str:
             font-style: normal;
         }}
         """
+
     return (
         """
     <style>
@@ -24,297 +25,264 @@ def load_styles() -> str:
         + font_face
         + """
     :root {
-        --sc-navy: #0A192F;
-        --sc-slate: #708090;
-        --sc-surface: #F4F4F9;
-        --sc-accent: #2E8B57;
-        --sc-accent-soft: rgba(46, 139, 87, 0.12);
-        --sc-border: rgba(10, 25, 47, 0.16);
-        --sc-soft: rgba(244, 244, 249, 0.82);
-        --sc-input-surface: rgba(255, 255, 255, 0.96);
-        --sc-input-border: rgba(10, 25, 47, 0.2);
-        --sc-dialog-shadow: 0 24px 60px rgba(10, 25, 47, 0.12);
-        --sc-body: 16px;
-        --sc-headline: 42px;
+        --ssa-blue: #003399;
+        --ssa-navy: #0A192F;
+        --ssa-slate: #708090;
+        --ssa-white: #F4F4F9;
+        --ssa-green: #2E8B57;
+        --ssa-gold: #D4AF37;
+        --ssa-border: rgba(10, 25, 47, 0.82);
+        --ssa-soft-border: rgba(10, 25, 47, 0.18);
+        --ssa-paper: rgba(255, 255, 255, 0.92);
+        --ssa-frost: rgba(244, 244, 249, 0.74);
+        --ssa-grid: rgba(112, 128, 144, 0.08);
+    }
+
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    #MainMenu,
+    footer {
+        display: none !important;
     }
 
     .stApp {
         background:
-            linear-gradient(180deg, rgba(10, 25, 47, 0.04), rgba(10, 25, 47, 0.01)),
-            linear-gradient(90deg, rgba(112, 128, 144, 0.08) 1px, transparent 1px),
-            linear-gradient(rgba(112, 128, 144, 0.08) 1px, transparent 1px),
-            var(--sc-surface);
-        background-size: auto, 24px 24px, 24px 24px, auto;
-        color: var(--sc-navy);
+            linear-gradient(180deg, rgba(0, 51, 153, 0.035), rgba(10, 25, 47, 0.01)),
+            linear-gradient(90deg, var(--ssa-grid) 1px, transparent 1px),
+            linear-gradient(var(--ssa-grid) 1px, transparent 1px),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.96));
+        background-size: auto, 18px 18px, 18px 18px, auto;
+        color: var(--ssa-navy);
         font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
-        font-size: var(--sc-body);
     }
 
     .block-container {
-        padding-top: 2rem;
+        max-width: 1760px;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
-        max-width: 1320px;
     }
 
     h1, h2, h3, p, label, span, div {
-        font-size: var(--sc-body);
-        line-height: 1.5;
+        color: var(--ssa-navy);
+        line-height: 1.35;
     }
 
-    .sc-hero {
-        border: 1px solid var(--sc-border);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.64));
-        backdrop-filter: blur(16px);
-        border-radius: 24px;
-        padding: 24px;
+    .ssa-topbar {
+        border: 2px solid var(--ssa-border);
+        border-radius: 34px;
+        padding: 30px 46px;
+        margin-bottom: 30px;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 244, 249, 0.82)),
+            linear-gradient(90deg, rgba(112, 128, 144, 0.08) 1px, transparent 1px),
+            linear-gradient(rgba(112, 128, 144, 0.08) 1px, transparent 1px);
+        background-size: auto, 26px 26px, 26px 26px;
     }
 
-    .sc-headline {
-        font-size: var(--sc-headline);
-        line-height: 1.05;
-        font-weight: 600;
+    .ssa-brand-line {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .ssa-brand {
+        font-size: 58px;
+        font-weight: 700;
         letter-spacing: -0.04em;
-        color: var(--sc-navy);
-        margin: 0 0 8px 0;
     }
 
-    .sc-status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border-radius: 999px;
-        border: 1px solid rgba(46, 139, 87, 0.3);
-        background: rgba(46, 139, 87, 0.12);
-        color: var(--sc-accent);
-        font-weight: 600;
+    .ssa-claim {
+        font-size: 42px;
+        font-weight: 400;
+        letter-spacing: -0.03em;
     }
 
-    .sc-kpi {
-        border: 1px solid var(--sc-border);
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 20px;
-        padding: 20px;
-        text-align: right;
-    }
-
-    .sc-kpi-value {
-        font-size: var(--sc-headline);
-        line-height: 1;
-        font-weight: 600;
-        color: var(--sc-navy);
-    }
-
-    .sc-panel {
-        border: 1px solid var(--sc-border);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.65));
-        border-radius: 24px;
-        padding: 24px;
+    .ssa-panel {
+        border: 2px solid var(--ssa-border);
+        border-radius: 30px;
+        padding: 24px 20px 20px;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 244, 249, 0.78)),
+            radial-gradient(circle at top right, rgba(212, 175, 55, 0.05), transparent 32%);
+        backdrop-filter: blur(16px);
         min-height: 100%;
     }
 
-    .sc-panel-title {
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: var(--sc-slate);
+    .ssa-history-panel {
+        min-height: 1040px;
+    }
+
+    .ssa-main-panel {
+        min-height: 1040px;
+    }
+
+    .ssa-prompt-panel {
+        min-height: 1040px;
+    }
+
+    .ssa-panel-title {
+        font-size: 32px;
         font-weight: 700;
-        margin-bottom: 12px;
+        letter-spacing: -0.03em;
+        margin-bottom: 18px;
     }
 
-    .sc-warning {
-        border-left: 4px solid #D4AF37;
-        background: rgba(212, 175, 55, 0.12);
-        border-radius: 14px;
-        padding: 12px 14px;
-        margin: 8px 0;
+    .ssa-panel-title-output {
+        margin-top: 22px;
     }
 
-    .sc-error {
-        border-left: 4px solid #B22222;
-        background: rgba(178, 34, 34, 0.1);
-        border-radius: 14px;
-        padding: 12px 14px;
-        margin: 8px 0;
+    .ssa-muted {
+        color: var(--ssa-slate);
+        font-size: 18px;
     }
 
-    .sc-muted {
-        color: var(--sc-slate);
-    }
-
-    .stButton > button {
-        border-radius: 999px;
-        border: 1px solid var(--sc-border);
-        padding: 0.7rem 1.2rem;
-        font-weight: 600;
-        background: rgba(255, 255, 255, 0.8);
-        color: var(--sc-navy);
-        box-shadow: none;
-    }
-
-    .stButton > button:hover,
-    .stDownloadButton > button:hover {
-        border-color: rgba(46, 139, 87, 0.4);
-        color: var(--sc-navy);
-    }
-
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(90deg, #0A192F, #003399);
-        color: white;
-        border: none;
-    }
-
-    .stDownloadButton > button {
+    .ssa-message,
+    .ssa-error {
         border-radius: 20px;
-        border: 1px solid var(--sc-border);
-        padding: 0.85rem 1.2rem;
-        font-weight: 600;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 244, 249, 0.9));
-        color: var(--sc-navy);
-        box-shadow: none;
+        padding: 14px 16px;
+        margin: 14px 0 8px;
+        border: 1px solid var(--ssa-soft-border);
+        font-size: 18px;
     }
 
-    .stDownloadButton > button:hover {
-        border-color: rgba(46, 139, 87, 0.45);
-        color: var(--sc-navy);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.96));
+    .ssa-message {
+        background: rgba(46, 139, 87, 0.12);
+        border-color: rgba(46, 139, 87, 0.28);
     }
 
-    .stDownloadButton > button:focus,
-    .stDownloadButton > button:focus-visible {
-        outline: 2px solid rgba(46, 139, 87, 0.25);
-        box-shadow: none;
-        color: var(--sc-navy);
+    .ssa-error {
+        background: rgba(212, 175, 55, 0.14);
+        border-color: rgba(212, 175, 55, 0.45);
     }
 
-    [data-testid="stWidgetLabel"] p,
-    .stTextArea label p,
-    .stFileUploader label p {
-        color: var(--sc-navy) !important;
+    [data-testid="stWidgetLabel"] p {
+        color: var(--ssa-navy) !important;
+        font-size: 18px !important;
         font-weight: 600 !important;
-        letter-spacing: 0.01em;
     }
 
     .stTextArea textarea,
-    .stTextInput input,
-    .stSelectbox div[data-baseweb="select"] {
-        border-radius: 18px !important;
-        border: 1px solid var(--sc-input-border) !important;
-        background: var(--sc-input-surface) !important;
-        color: var(--sc-navy) !important;
+    .stSelectbox div[data-baseweb="select"] > div,
+    .stTextInput input {
+        border-radius: 24px !important;
+        border: 1.5px solid rgba(10, 25, 47, 0.26) !important;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.94)) !important;
+        color: var(--ssa-navy) !important;
         box-shadow: none !important;
+        font-size: 20px !important;
+    }
+
+    .stTextArea textarea {
+        padding: 18px !important;
+        line-height: 1.5 !important;
     }
 
     .stTextArea textarea::placeholder,
     .stTextInput input::placeholder {
-        color: rgba(112, 128, 144, 0.95) !important;
+        color: rgba(112, 128, 144, 0.92) !important;
     }
 
-    .stTextArea textarea:focus,
-    .stTextInput input:focus,
-    .stTextArea textarea:focus-visible,
-    .stTextInput input:focus-visible {
-        border-color: rgba(46, 139, 87, 0.55) !important;
-        box-shadow: 0 0 0 1px rgba(46, 139, 87, 0.15) !important;
-        outline: none !important;
+    .stButton > button {
+        min-height: 70px;
+        border-radius: 24px;
+        border: 2px solid var(--ssa-border);
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 244, 249, 0.9));
+        color: var(--ssa-navy);
+        box-shadow: none;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
     }
 
-    [data-testid="stFileUploaderDropzone"] {
-        border-radius: 20px !important;
-        border: 1px dashed rgba(10, 25, 47, 0.25) !important;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 244, 249, 0.9)) !important;
-        padding: 0.9rem 1rem !important;
+    .stButton > button:hover {
+        border-color: var(--ssa-blue);
+        color: var(--ssa-blue);
     }
 
-    [data-testid="stFileUploaderDropzone"] * {
-        color: var(--sc-navy) !important;
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(180deg, rgba(0, 51, 153, 0.98), rgba(10, 25, 47, 0.98));
+        color: white;
+        border-color: rgba(0, 51, 153, 0.98);
     }
 
-    [data-testid="stFileUploaderDropzoneInstructions"] span,
-    [data-testid="stFileUploaderDropzoneInstructions"] small,
-    [data-testid="stFileUploaderDropzone"] small {
-        color: var(--sc-slate) !important;
+    .ssa-history-list .stButton > button {
+        min-height: 52px;
+        font-size: 18px;
+        font-weight: 600;
+        justify-content: flex-start;
+        padding-left: 14px;
+        margin-bottom: 10px;
     }
 
-    [data-testid="stFileUploaderDropzone"] button {
-        position: relative;
-        min-width: 190px;
-        border-radius: 16px !important;
-        border: 1px solid rgba(10, 25, 47, 0.2) !important;
-        background: rgba(255, 255, 255, 0.98) !important;
+    .ssa-history-list .stButton > button p {
+        text-align: left;
+        white-space: normal;
+    }
+
+    .ssa-upload-field [data-testid="stFileUploaderDropzone"] {
+        min-height: 70px;
+        border-radius: 24px !important;
+        border: 2px solid var(--ssa-border) !important;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 244, 249, 0.9)) !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+
+    .ssa-upload-field [data-testid="stFileUploaderDropzoneInstructions"] {
+        display: none !important;
+    }
+
+    .ssa-upload-field [data-testid="stFileUploaderDropzone"] button {
+        width: 100%;
+        min-height: 54px;
+        border-radius: 18px !important;
+        border: 0 !important;
+        background: transparent !important;
         color: transparent !important;
         box-shadow: none !important;
+        position: relative;
     }
 
-    [data-testid="stFileUploaderDropzone"] button::after {
-        content: "Open file explorer";
+    .ssa-upload-field [data-testid="stFileUploaderDropzone"] button::after {
+        content: "Upload File";
         position: absolute;
         inset: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--sc-navy);
-        font-size: var(--sc-body);
-        font-weight: 600;
-    }
-
-    .streamlit-expanderHeader {
-        color: var(--sc-navy) !important;
-        font-weight: 600 !important;
-    }
-
-    [data-testid="stExpander"] {
-        background: rgba(255, 255, 255, 0.78);
-        border: 1px solid var(--sc-border);
-        border-radius: 20px;
-        padding: 4px 10px;
-    }
-
-    [data-testid="stDialog"] [role="dialog"] {
-        border-radius: 28px;
-        border: 1px solid rgba(10, 25, 47, 0.12);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.96));
-        box-shadow: var(--sc-dialog-shadow);
-    }
-
-    [data-testid="stDialog"] [role="dialog"] > div {
-        padding-top: 0.35rem;
-    }
-
-    .sc-dialog-card {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.96));
-        border: 1px solid rgba(10, 25, 47, 0.12);
-        border-radius: 22px;
-        padding: 18px 20px;
-        margin-bottom: 12px;
-    }
-
-    .sc-dialog-title {
-        color: var(--sc-navy);
+        color: var(--ssa-navy);
         font-size: 22px;
-        font-weight: 600;
-        line-height: 1.2;
-        margin-bottom: 8px;
-    }
-
-    .sc-dialog-copy {
-        color: var(--sc-slate);
-    }
-
-    .sc-dialog-questions {
-        color: var(--sc-navy);
         font-weight: 700;
-        letter-spacing: 0.02em;
-        margin: 18px 0 10px;
+        letter-spacing: -0.02em;
     }
 
-    [data-testid="stDialog"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stDialog"] [data-testid="stMarkdownContainer"] li,
-    [data-testid="stDialog"] [data-testid="stMarkdownContainer"] strong {
-        color: var(--sc-navy);
+    .ssa-upload-field small {
+        display: none !important;
     }
 
-    [data-testid="stDialog"] .stTextArea textarea {
-        min-height: 150px;
+    .stSelectbox div[data-baseweb="select"] > div {
+        min-height: 72px;
+        font-size: 22px !important;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    iframe[title^="components.html"] {
+        border-radius: 24px;
+    }
+
+    @media (max-width: 1400px) {
+        .ssa-brand {
+            font-size: 48px;
+        }
+
+        .ssa-claim {
+            font-size: 34px;
+        }
     }
     </style>
     """

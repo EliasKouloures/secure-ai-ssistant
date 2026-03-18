@@ -1,49 +1,52 @@
 # Troubleshooting
 
-## Backend offline
+## The app says LM Studio could not be reached
 
-- Confirm LM Studio is running.
-- Confirm the local server is started.
-- Confirm `base_url` and `model_id` in `config.toml`.
-- Use the Diagnostics panel in the app to inspect reachability and recent errors.
+Check:
 
-## Wrong model loaded
+1. LM Studio is open
+2. the local server is running
+3. the server address is `http://127.0.0.1:1234/v1`
+4. `meta-llama-3.1-8b-instruct` is loaded
 
-- Check the model loaded in LM Studio.
-- Make sure `model_id` in `config.toml` matches what LM Studio is actually serving.
-- Restart the local server after changing models.
+## The app says the model took too long
 
-## Vision OCR unavailable
+Try:
 
-- Enable `supports_vision = true` only when the selected local model actually supports image input.
-- If vision is unavailable, paste text manually and continue with the text workflow.
+- shorter context
+- shorter prompt
+- LM Studio temperature `0.2`
+- closing other heavy apps
 
-## PDF parsing failed
+## The launcher command is not found
 
-- Check the file size and page count limits in `config.toml`.
-- If the PDF is scanned and no vision model is active, paste the text manually or load a vision-capable model.
+Use:
 
-## Python command not found on macOS
+```bash
+.venv/bin/secure-secr-ai-tery
+```
 
-- Run `python3 --version`.
-- If `python3` exists, use `python3 -m venv .venv`.
-- Do not worry if `python3.12` is missing. That is normal on many Macs.
+Legacy fallback:
 
-## Launcher command not found
+```bash
+.venv/bin/sekretariat-copilot
+```
 
-- Activate the virtual environment first.
-- On macOS, run `source .venv/bin/activate`.
-- On Windows, run `.venv\Scripts\Activate.ps1`.
-- If needed, launch the app directly from `.venv`.
+## Save Prompt did not create the title I expected
 
-## Windows virtual environment issues
+New prompt titles come from the first non-empty line.
+Edit that line and save again.
 
-- Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` if PowerShell blocks activation.
-- Re-open the shell after Python installation if `py -3.12` is not found immediately.
+## Delete Output did not seem to work
 
-## The browser still shows an old broken page
+Refresh once and try again.
+The current build now clears the output field via safe Streamlit state sync.
 
-- Stop the app.
-- Start it again.
-- Hard refresh the browser tab.
-- If the app was recently restyled, the browser may be showing cached assets.
+## History is empty
+
+History only appears after you run at least one prompt successfully.
+
+## The wrong prompt text loaded
+
+Check the top prompt selector.
+If you chose `Add new Prompt`, the lower editor stays blank until you type or paste a prompt.

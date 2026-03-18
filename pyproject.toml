@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sekretariat-copilot"
+name = "secure-secr-ai-tery"
 version = "0.1.0"
-description = "Local-first school administration assistant for offline-friendly workflows."
+description = "Private, offline-friendly prompt workspace for European schools and school support teams."
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
 license = { text = "MIT" }
@@ -28,6 +28,7 @@ dev = [
 ]
 
 [project.scripts]
+secure-secr-ai-tery = "app.launcher:main"
 sekretariat-copilot = "app.launcher:main"
 
 [tool.setuptools]

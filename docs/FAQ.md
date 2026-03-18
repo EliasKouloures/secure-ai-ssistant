@@ -1,93 +1,65 @@
 # FAQ
 
-## Is this a cloud AI service?
+## Is this a cloud service?
 
 No.
-
-The default path is local-first:
-
-- local web app
-- local model host
-- local machine by default
-
-That means a school can evaluate the workflow without defaulting to public cloud inference.
-
-## Does it send messages automatically?
-
-No.
-
-The app never auto-sends communication.
-Staff review, edit, and copy the output themselves.
-
-## Does it replace the school information system?
-
-No.
-
-It is a sidecar.
-It helps with drafting, summarising, and extraction work around existing systems.
-
-## Is this legally compliant?
-
-No repo can promise that on its own.
-
-This project is designed to be more governance-friendly through local processing, limited logging, and human review.
-Each school still needs its own legal, policy, and data protection review.
-
-## Why mention the US CLOUD Act and European concerns?
-
-Because many European schools want to reduce avoidable cloud risk when a local path exists.
-
-The point is not that every foreign service is automatically unlawful.
-The point is that local-first often creates a cleaner starting posture.
-
-## Why LM Studio?
-
-Because it is one of the easiest ways for non-AI specialists to run a local model through an OpenAI-compatible endpoint.
-
-It is especially practical for small pilots on Apple Silicon machines.
-
-## Can this run on Windows?
-
-Yes.
-
-The same repo supports Windows.
-See the [Windows Setup Guide](WINDOWS_SETUP.md).
+The default path is a local web app talking to a local LM Studio server on the same machine.
 
 ## Does it work offline?
 
-Yes, after the local models are downloaded.
+Yes, after Python dependencies and the model are installed.
 
-The app can run fully offline on one machine if the model is already installed locally.
-
-## Can it handle screenshots and scanned PDFs?
-
-Sometimes, yes.
-
-The app supports image and PDF workflows, but image OCR depends on the local model and input quality.
-Digital PDFs are the easiest file path because the app tries direct text extraction first.
-
-## Does it support handwriting?
+## Does it auto-send anything?
 
 No.
+Users copy the output into their next program manually.
 
-Handwritten cursive is out of scope for the MVP.
+## What does the History panel store?
 
-## Can it process multi-child messages?
+It stores local run history in SQLite:
 
-No.
+- typed context
+- prompt title
+- prompt body
+- output text
+- file names
 
-Those are blocked in the MVP because they raise ambiguity risk.
+It does not need to persist uploaded file bodies.
 
-## Who should use this repo first?
+## How are new prompt titles created?
 
-- school leaders who want a calm, credible AI pilot story
-- school offices who want to test one useful workflow
-- IT teams who want an inspectable local-first architecture
+If the user chooses `Add new Prompt`, the first non-empty line becomes the saved title.
 
-## Where should a school start?
+## Why not force a separate prompt title field?
 
-Start here:
+Because the app is aimed at non-technical users.
+One editor is easier than two.
 
-1. [School Leader Brief](SCHOOL_LEADER_BRIEF.md)
-2. [Pilot Checklist](PILOT_CHECKLIST.md)
-3. [IT Deployment Guide](IT_DEPLOYMENT.md)
+## Why keep the repo name as Sekretariat-Copilot?
+
+Continuity.
+The public repo already exists under that name.
+The product name inside the app is now `Secure Secr-AI-tery`.
+
+## Is this automatically GDPR compliant?
+
+No software can promise that on its own.
+
+What this repo does offer is a more defensible starting posture:
+
+- local processing
+- local storage
+- no automatic outbound action
+- no mandatory cloud inference
+
+## Is this suitable for the EU AI Act?
+
+It is designed to support a lower-friction governance posture, but legal evaluation still depends on the actual use case, data, and school context.
+
+## Which model is recommended?
+
+`meta-llama-3.1-8b-instruct`
+
+## Why that model?
+
+It is steadier for school-office drafting than the uncensored model variant that was tested earlier.

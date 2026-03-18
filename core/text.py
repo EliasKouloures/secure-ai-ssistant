@@ -30,6 +30,26 @@ def strip_hidden_reasoning(text: str) -> str:
     return normalise_whitespace(cleaned)
 
 
+def strip_hidden_reasoning_preserve_layout(text: str) -> str:
+    cleaned = THINK_TAG_RE.sub("", text)
+    cleaned = XML_TAG_RE.sub("", cleaned)
+    cleaned = CODE_FENCE_RE.sub("", cleaned)
+    cleaned = re.sub(r"\[\[(?:analysis|reasoning)[^\]]*\]\]", "", cleaned, flags=re.IGNORECASE)
+    cleaned = cleaned.replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.strip() for line in cleaned.split("\n")]
+    collapsed_lines: list[str] = []
+    blank_pending = False
+    for line in lines:
+        if line:
+            if blank_pending and collapsed_lines:
+                collapsed_lines.append("")
+            collapsed_lines.append(re.sub(r"[ \t]+", " ", line))
+            blank_pending = False
+        else:
+            blank_pending = True
+    return "\n".join(collapsed_lines).strip()
+
+
 def clean_json_block(text: str) -> str:
     stripped = strip_hidden_reasoning(text)
     if stripped.startswith("{") and stripped.endswith("}"):

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from core.models import (
+    AssistantRun,
     Case,
     CaseStatus,
     ConfidenceLevel,
@@ -39,3 +40,35 @@ def test_repository_round_trip_and_reset(tmp_path: Path) -> None:
     assert repository.count_cases_today() >= 0
     assert repository.reset_case("case_001") is True
     assert repository.get_case_bundle("case_001") is None
+
+
+def test_repository_lists_assistant_runs_newest_first(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "repo.db")
+    older = AssistantRun(
+        id="run_001",
+        title="Older task",
+        preview="Summarise a parent email",
+        context_text="Parent message one",
+        prompt_title="Summarise",
+        prompt_body="Summarise the message.",
+        output_text="Summary one",
+        created_at=datetime(2026, 3, 12, 9, 0, tzinfo=UTC),
+    )
+    newer = AssistantRun(
+        id="run_002",
+        title="Newer task",
+        preview="Draft a school reply",
+        context_text="Parent message two",
+        prompt_title="Draft reply",
+        prompt_body="Write a clear reply.",
+        output_text="Reply two",
+        created_at=datetime(2026, 3, 12, 10, 0, tzinfo=UTC),
+    )
+
+    repository.insert_assistant_run(older)
+    repository.insert_assistant_run(newer)
+
+    history = repository.list_assistant_runs()
+
+    assert [item.id for item in history] == ["run_002", "run_001"]
+    assert repository.get_assistant_run("run_001").title == "Older task"

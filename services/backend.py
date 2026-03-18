@@ -10,7 +10,7 @@ from typing import Any, Protocol, cast
 from core.config import BackendProfile
 from core.errors import AppError
 from core.models import ErrorCode, HealthCheckResult
-from core.text import parse_json, strip_hidden_reasoning
+from core.text import parse_json, strip_hidden_reasoning, strip_hidden_reasoning_preserve_layout
 from services.prompt_loader import PromptLoader
 
 
@@ -26,6 +26,8 @@ class BackendClient(Protocol):
     def health_check(self) -> HealthCheckResult: ...
 
     def generate_reply_payload(self, context: dict[str, Any]) -> dict[str, Any]: ...
+
+    def generate_assistant_text(self, context: dict[str, Any]) -> str: ...
 
     def ocr_image(self, image_bytes: bytes, mime_type: str, filename: str) -> VisionOCRResult: ...
 
@@ -86,6 +88,17 @@ class OpenAICompatibleBackend:
             raise AppError(
                 ErrorCode.MODEL_TIMEOUT, f"Backend returned invalid JSON: {exc}"
             ) from exc
+
+    def generate_assistant_text(self, context: dict[str, Any]) -> str:
+        system_prompt = self.prompt_loader.load("assistant_system.txt")
+        user_prompt = self.prompt_loader.load("assistant_user.txt").format(**context)
+        payload = self._chat(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
+        return strip_hidden_reasoning_preserve_layout(payload)
 
     def ocr_image(self, image_bytes: bytes, mime_type: str, filename: str) -> VisionOCRResult:
         system_prompt = self.prompt_loader.load("vision_system.txt")

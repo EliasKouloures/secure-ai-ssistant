@@ -1,438 +1,226 @@
-# Sekretariat-Copilot (GER) aka Secretary Copilot (ENG)
+# Secure Secr-AI-tery
 
-![Sekretariat-Copilot banner](docs/assets/sekretariat-copilot-banner.png)
+![Secure Secr-AI-tery banner](docs/assets/sekretariat-copilot-banner.png)
 
-Free, local-first AI for school offices.
+**Your Free, Private & Offline AI Assistant.**
 
-Turn messy parent emails, typed phone notes, screenshots, and PDFs into clean, review-ready admin outputs on a school-controlled machine.
+Secure Secr-AI-tery is a calm local workspace for school offices, school leaders, educators, and support teams.
 
-This repo is public on purpose. It is both:
+It gives staff one clean screen for three things:
 
-1. a free working tool for school administration workflows
-2. a live proof-of-work for privacy-first AI product and deployment services
+1. add context, information, and 2do's
+2. choose or edit a saved prompt
+3. run the local model and copy the result into email, a school system, or another tool
 
-It is built for European schools that want useful AI without defaulting to US cloud dependency, recurring token bills, or vague pilot theatre.
-
----
+Nothing is auto-sent.
+Nothing requires a cloud account.
+Nothing needs a prompt engineer.
 
 ## Start Here
 
-| If you are... | Start here | Why |
-| --- | --- | --- |
-| A principal, school leader, governor, or decision-maker | [School Leader Brief](docs/SCHOOL_LEADER_BRIEF.md) | Get the value, risk posture, and pilot shape in a few minutes |
-| A school office administrator or educator | Read this README from top to bottom | Understand the use case in plain language |
-| An IT lead, DPO, or technical reviewer | [IT Deployment Guide](docs/IT_DEPLOYMENT.md) | Get the install, rollout, and governance path |
-| Planning a first trial | [Pilot Checklist](docs/PILOT_CHECKLIST.md) | Scope a credible first pilot without confusion |
-| Evaluating common concerns | [FAQ](docs/FAQ.md) | Get short answers to the usual questions |
+| If you are... | Read this first |
+| --- | --- |
+| a principal, headteacher, governor, or school decision-maker | [School Leader Brief](docs/SCHOOL_LEADER_BRIEF.md) |
+| a school office operator or educator | this README |
+| IT, a DPO, or a technical reviewer | [IT Deployment Guide](docs/IT_DEPLOYMENT.md) |
+| testing on Windows | [Windows Setup](docs/WINDOWS_SETUP.md) |
+| preparing a first trial | [Pilot Checklist](docs/PILOT_CHECKLIST.md) |
 
----
+## What The App Does
 
-## What This Means for a School Office
+The app follows one simple desktop flow:
 
-School administration is full of repetitive work that still needs care:
+1. open a past conversation from `History`, or start a new one
+2. type or paste the task into `Context, Info & 2do's`
+3. add one file if it helps
+4. pick a saved prompt from `Prompts`, or write a new one
+5. click `Run Prompt`
+6. read the result in `AI Output`
+7. delete it or copy it into the next program
 
-- absence messages
-- parent replies
-- phone notes
-- meeting summaries
-- document triage
-- copy-paste into legacy systems
+The layout is intentionally rigid and simple for non-technical staff:
 
-Most of this work is not hard.
-It is just constant.
+- left: recent chat history, newest first
+- middle top: the current task context
+- middle bottom: the current AI output
+- right top: the prompt selector
+- right bottom: the full editable prompt
 
-Sekretariat-Copilot helps staff turn messy inputs into a clean case pack:
+## Why This Is Useful For Schools
 
-- structured facts
-- a short internal brief
-- three subject line options
-- three draft reply styles
-- warnings where information is missing
-- clarifying questions when the source is unclear
+School work is full of messages, notes, context fragments, and requests that need a reply, a summary, or a next step.
 
-The point is simple:
+Most of that work is not complex.
+It is repetitive.
+It still needs judgement.
 
-**staff stay in control, the tool does the repetitive drafting work, and nothing is sent automatically.**
+Secure Secr-AI-tery helps staff:
 
----
+- draft calm replies
+- summarise meetings
+- turn rough notes into action lists
+- prepare internal briefings
+- reuse strong prompts without rewriting them each time
 
-## Why This Project Stands Out
+## Why Local-First Matters In Europe
 
-Many AI pilots fail because they start too wide, look too vague, or depend too quickly on external cloud services.
+This repo is built around a practical principle:
 
-Sekretariat-Copilot is different by design.
+**if a school can keep routine AI drafting on a school-controlled machine, it removes a large amount of avoidable cloud complexity from day one.**
 
-- It is narrow.
-  It solves one clear class of work: school administration handling.
-- It is local-first.
-  The app and model can run on the same machine.
-- It is human-in-the-loop.
-  Every output is reviewed before use.
-- It is easier to defend.
-  Local processing removes a large amount of avoidable cloud complexity at the start.
-- It is easier to trial.
-  One pilot machine is enough.
-- It is cheaper to explore.
-  Local models mean no default per-token billing.
-- It is public and inspectable.
-  IT staff can review the repo, architecture, prompts, and tests directly.
+That matters because many schools worry about:
 
-That makes it easier to explain to school leaders, administrators, and technical reviewers at the same time.
+- data leaving the institution too quickly
+- third-country transfer questions
+- unclear processor chains
+- foreign access risk under laws such as the US CLOUD Act
+- recurring usage fees for everyday drafting
 
----
+This project does not claim instant legal compliance by magic.
+It makes a narrower and more useful promise:
 
-## Why Local-First Matters in Europe
+- local by default
+- offline-capable once the model is installed
+- no mandatory cloud inference
+- no automatic outbound action
+- human review before anything is used elsewhere
 
-Many European schools are not comfortable sending routine school communications through external AI clouds by default.
+That gives schools a stronger starting posture for GDPR review and for EU AI Act governance conversations.
+It also removes default per-token costs when used with local models.
 
-That concern is reasonable.
+## Why Decision-Makers Like It
 
-If personal data is processed by a US-controlled cloud provider, schools may need to think carefully about:
+- It is easy to understand on one screen.
+- It is easy to trial on one machine.
+- It is easier to explain to staff than a general-purpose AI platform.
+- It creates a visible privacy story, not just a marketing story.
+- It can be inspected by IT because the repo, prompts, and logic are open.
 
-- third-country transfer exposure
-- vendor and sub-processor risk
-- contractual safeguards
-- supervisory guidance
-- access by foreign authorities
-- the practical meaning of the US CLOUD Act
+## Why Operators Like It
 
-This repo does not claim that every US vendor is automatically unlawful in every case.
+- One place for context
+- One place for prompts
+- One clear run button
+- One clear output box
+- One clear copy button
+- Prompt reuse without technical setup
 
-It makes a narrower and more useful point:
+## Why IT Teams Like It
 
-**if you can keep routine drafting and extraction work on a school-controlled machine, you remove a large amount of avoidable cloud complexity from the start.**
+- Python app
+- SQLite
+- local LM Studio server
+- no container requirement
+- cross-platform repo
+- easy rollback
+- no default internet dependency after setup
 
-That matters for trust.
-That matters for procurement.
-That matters for governance.
-That matters for the everyday confidence of staff.
+## Prompt Library
 
----
+The right-hand side is a local prompt library.
 
-## What a School Gets
+- `Prompts` opens the saved prompt list.
+- `Add new Prompt` starts a blank prompt.
+- selecting a saved prompt loads its full text into the lower editor
+- the lower editor is always editable
+- `Save Prompt` writes the prompt into the local library
 
-For a typical case, the app returns:
+Important:
+When you save a brand-new prompt, the app uses the **first non-empty line** as the prompt title.
+That keeps the workflow simple for non-technical users and avoids forcing a separate title form.
 
-- structured admin facts
-- a concise internal case brief
-- exactly three subject lines
-- exactly three draft variants
-- visible warnings
-- clarifying questions when needed
+## History
 
-The three reply styles always follow the same order:
+The left history panel stores past local runs from newest to oldest.
 
-1. Hemingway-style
-2. Corporate
-3. Educator-first
+Each item shows a short purpose label so users can quickly reopen:
 
-That consistency matters in office work.
+- what they were trying to do
+- which prompt they used
+- what kind of task the run was about
 
----
+The app stores the local conversation context, prompt text, output text, and file names in SQLite so the user can reopen a previous run.
+It does **not** need to store uploaded file bodies to make history work.
 
-## What a Good First Pilot Looks Like
+## Recommended First Use
 
-Start small.
+Start with three saved prompts only:
 
-Use the repo to test one narrow promise:
+1. `Draft a calm reply`
+2. `Summarise key points`
+3. `Turn notes into action list`
 
-**Can this save the school office time on repetitive drafting without creating new trust problems?**
+That is enough for a clean first pilot.
 
-Recommended first pilot:
+## Quick Start For IT
 
-1. one school office workflow owner
-2. one dedicated pilot machine
-3. synthetic fixtures first
-4. text and digital PDFs first
-5. image OCR only after the core path feels stable
-6. no real sensitive material until the local process is understood
-
-This is how you avoid pilot purgatory.
-
----
-
-## The Operator Experience
-
-No prompt engineering is needed.
-
-1. Open the app in a browser on the local machine.
-2. Paste a message, type a note, or upload a file.
-3. Leave workflow detection on auto, or choose a workflow.
-4. Click `Process locally`.
-5. Review the facts, brief, subjects, and drafts.
-6. Edit if needed.
-7. Copy the final text into email or the school system.
-8. Click `Reset case`.
-
-That is the whole loop.
-
----
-
-## Architecture at a Glance
-
-```mermaid
-flowchart LR
-    A["School staff"] --> B["Browser"]
-    B --> C["Streamlit app"]
-    C --> D["Python service layer"]
-    D --> E["SQLite"]
-    D --> F["LM Studio local server"]
-    F --> G["Local model"]
-```
-
-Default posture:
-
-- bind to `127.0.0.1`
-- keep intranet mode off
-- treat raw source material as transient
-- store only derived outputs and minimal audit metadata
-- never auto-send communication
-
----
-
-## What It Does
-
-- accepts pasted text, typed notes, images, and PDFs
-- detects the likely workflow and lets staff override it
-- extracts facts locally
-- drafts clean copy-ready outputs
-- flags missing or contradictory information
-- exports text, JSON, and CSV
-- stores only minimal local audit metadata by default
-
----
-
-## What It Refuses to Do
-
-- auto-send emails
-- guess mandatory missing facts
-- process multi-child cases in MVP
-- pretend low-quality OCR is reliable
-- support handwritten cursive
-- behave like an autonomous decision-maker
-
-That restraint is deliberate.
-
----
-
-## Why the Cost Model Is Attractive
-
-If you run this with local models:
-
-- there are no per-token API fees
-- there is no mandatory AI SaaS subscription
-- there is no cost spike when staff use it more
-
-There are still real costs:
-
-- hardware
-- setup
-- maintenance
-- support
-
-But there is no default meter running every time someone drafts a reply.
-
----
-
-## GDPR and EU AI Act Positioning
-
-This repo is designed to be more governance-friendly.
-It is not a magic compliance certificate.
-
-The design supports sensible choices such as:
-
-- local processing by default
-- limited logging
-- human review before use
-- no auto-send
-- clear warnings on low-confidence cases
-- clear blocking of unsupported cases
-
-This MVP is meant for:
-
-- drafting
-- summarising
-- extracting facts
-- generating clarifying questions
-
-It is not meant for:
-
-- grading
-- admissions decisions
-- behavioural monitoring
-- automated disciplinary decisions
-
-Schools still need their own review of:
-
-- lawful basis
-- retention
-- access control
-- staff guidance
-- DPIA needs
-- local and national education rules
-
-In short:
-
-**this tool is built to support a safer local-first posture, not to replace legal or policy review.**
-
----
-
-## Docs by Audience
-
-### For school leaders
-
-- [School Leader Brief](docs/SCHOOL_LEADER_BRIEF.md)
-- [Pilot Checklist](docs/PILOT_CHECKLIST.md)
-- [Demo Runbook](docs/DEMO_RUNBOOK.md)
-
-### For school offices and educators
-
-- [FAQ](docs/FAQ.md)
-- [Fixtures overview](fixtures/README.md)
-
-### For IT, DPO, and technical reviewers
-
-- [IT Deployment Guide](docs/IT_DEPLOYMENT.md)
-- [Privacy Note](docs/PRIVACY.md)
-- [Windows Setup Guide](docs/WINDOWS_SETUP.md)
-- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
-
-### For contributors and reviewers
-
-- [Contributing Guide](CONTRIBUTING.md)
-- [Security Policy](SECURITY.md)
-
----
-
-## LM Studio in Plain Terms
-
-LM Studio is the recommended local model host for this repo.
-
-Why:
-
-- it gives schools a visible desktop app
-- it runs well on Apple Silicon
-- it exposes an OpenAI-compatible local endpoint
-- it is easier for non-AI specialists than building an inference stack from scratch
-
-The app talks to LM Studio through `http://127.0.0.1:1234/v1`.
-
-That keeps the app portable.
-If a school later wants a different OpenAI-compatible local backend, the service layer is already designed for that.
-
-Full setup instructions are in the [IT deployment guide](docs/IT_DEPLOYMENT.md).
-
----
-
-## Repository Layout
-
-- `app/` Streamlit UI, styles, launcher, and copy helpers
-- `core/` typed models, config, storage, and text utilities
-- `services/` analysis, ingestion, output generation, export, backend, and orchestration
-- `prompts/` prompt templates
-- `fixtures/` synthetic regression fixtures and demo material
-- `tests/` automated tests
-- `docs/` audience guides, deployment notes, privacy note, troubleshooting, and demo material
-
----
-
-## Developer Checks
+The full setup is in the [IT Deployment Guide](docs/IT_DEPLOYMENT.md).
+The shortest local path is:
 
 ```bash
-ruff check .
-mypy app core services
-pytest
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[dev]'
+cp config.example.toml config.toml
+secure-secr-ai-tery
 ```
 
-Run the app:
+If the new launcher name is not found yet, the legacy fallback still works:
 
 ```bash
 sekretariat-copilot
 ```
 
----
+## Recommended LM Studio Model
 
-## Why This Repo Is Free
+Default app profile:
 
-I am giving this away for free because the repo itself is useful.
+- backend: LM Studio local server
+- model: `meta-llama-3.1-8b-instruct`
+- temperature: `0.2`
+- timeout: `120`
 
-It helps schools and organisations:
+Recommended LM Studio inference settings are documented in the [IT Deployment Guide](docs/IT_DEPLOYMENT.md).
 
-- evaluate a real local-first AI workflow
-- understand what a calm, governable AI product can look like
-- test a narrow use case before buying something large
+## Repository Structure
 
-It also shows how I work:
+- `app/` UI and launcher
+- `core/` typed models, config, storage, and shared helpers
+- `services/` prompt runs, backend integration, file handling, and exports
+- `prompts/` saved starter prompts and runtime prompt templates
+- `fixtures/` synthetic examples for testing and demos
+- `tests/` unit and integration tests
+- `docs/` leadership, IT, privacy, pilot, and troubleshooting guides
 
-- from idea to product
-- from policy concern to system design
-- from UX to implementation
-- from GitHub proof to deployable demo
+## Limitations
 
-The software is free.
-The deeper value is in adaptation, rollout, training, and institution-ready implementation.
+- This is a desktop-first tool, not a mobile app.
+- It is designed for human-reviewed drafting, not autonomous action.
+- Uploaded files are single-file in the current UI by design, to keep the workflow simple.
+- Prompt titles for new prompts are derived automatically from the first non-empty line.
+- The GitHub repo name still says `Sekretariat-Copilot` for continuity, even though the app is now branded `Secure Secr-AI-tery`.
 
----
+## Related Documents
 
-## If You Want to Work With Me
+- [IT Deployment Guide](docs/IT_DEPLOYMENT.md)
+- [Windows Setup](docs/WINDOWS_SETUP.md)
+- [School Leader Brief](docs/SCHOOL_LEADER_BRIEF.md)
+- [Privacy Notes](docs/PRIVACY.md)
+- [FAQ](docs/FAQ.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Pilot Checklist](docs/PILOT_CHECKLIST.md)
+- [Demo Runbook](docs/DEMO_RUNBOOK.md)
+- [Screen Recording Script](docs/SCREEN_RECORDING_SCRIPT.md)
+- [Product Brief / PRD](docs/PRD.md)
 
-This repo is a free public deliverable.
-It is also a signal.
+## Creator
 
-If you want help turning local-first AI into something your school or organisation can actually use, I can support work such as:
+**Elias Kouloures = US-Speed + EU-Safeguards + Award-Winning Creativity**
 
-- workflow discovery
-- school-specific prompt and policy design
-- privacy-first rollout planning
-- local deployment setup
-- stakeholder demos
-- training for administrators and educators
-- proof-of-concept to production pathway design
-
----
-
-## Further Reading
-
-- [EU AI Act official text (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)
-- [EU AI Act summary (EUR-Lex)](https://eur-lex.europa.eu/EN/legal-content/summary/rules-for-trustworthy-artificial-intelligence-in-the-eu.html)
-- [GDPR official text (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2016/679/oj)
-- [GDPR summary (EUR-Lex)](https://eur-lex.europa.eu/EN/legal-content/summary/general-data-protection-regulation-gdpr.html)
-- [EDPS 2024 Microsoft 365 decision summary](https://www.edps.europa.eu/press-publications/press-news/press-releases/2024/european-commissions-use-microsoft-365-infringes-data-protection-law-eu-institutions-and-bodies)
-- [EDPS 2025 follow-up on Commission compliance](https://www.edps.europa.eu/press-publications/press-news/press-releases/2025/european-commission-brings-use-microsoft-365-compliance-data-protection-rules-eu-institutions-and-bodies_en)
-- [US DOJ CLOUD Act resources](https://www.justice.gov/dag/cloudact)
-- [LM Studio docs](https://lmstudio.ai/docs/)
-- [LM Studio local server docs](https://lmstudio.ai/docs/developer/core/server)
-- [LM Studio offline operation docs](https://lmstudio.ai/docs/app/offline)
-
----
-
-## Bottom Line
-
-If your school wants a first serious step into AI without defaulting to cloud dependency, subscription creep, and governance chaos, this repo is a practical place to start.
-
-It is not a full school platform.
-It is not legal advice.
-It is not auto-pilot.
-
-It is a focused local-first administrative sidecar designed to save staff time while keeping people, oversight, and trust in the loop.
-
----
-
-## Contact
-
-If you want to explore a pilot, a local-first rollout, or a custom version for your school or organisation, I would be glad to speak with you.
-
-**Elias Kouloures**
-US-Speed + EU-Safeguards + Award-Winning Creativity
-
-Homezone: Berlin, Germany
-
-Videocall: [calendar.app.google/ANb76KDuvg4J7LS28](https://calendar.app.google/ANb76KDuvg4J7LS28)
-
-E-Mail: [Elias.Kouloures@gmail.com](mailto:Elias.Kouloures@gmail.com)
-
-Website: [EliasKouloures.com](https://EliasKouloures.com)
-
-Videos: [YouTube.com/@EliasKouloures](https://YouTube.com/@EliasKouloures)
-
-Business: [LinkedIn.com/in/eliaskouloures/](https://LinkedIn.com/in/eliaskouloures/)
+- Homezone: Berlin, Germany
+- Videocall: [calendar.app.google/ANb76KDuvg4J7LS28](https://calendar.app.google/ANb76KDuvg4J7LS28)
+- E-Mail: [Elias.Kouloures@gmail.com](mailto:Elias.Kouloures@gmail.com)
+- Website: [EliasKouloures.com](https://EliasKouloures.com)
+- Videos: [YouTube.com/@EliasKouloures](https://YouTube.com/@EliasKouloures)
+- Business: [LinkedIn.com/in/eliaskouloures](https://LinkedIn.com/in/eliaskouloures/)

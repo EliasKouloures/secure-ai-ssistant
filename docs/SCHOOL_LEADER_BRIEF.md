@@ -1,167 +1,89 @@
 # School Leader Brief
 
-This is the fast briefing for principals, school leaders, governors, and decision-makers.
-
-If you want the technical path, go to the [IT Deployment Guide](IT_DEPLOYMENT.md).
-
----
+This is the fast briefing for principals, governors, leadership teams, and school decision-makers.
 
 ## In One Line
 
-Sekretariat-Copilot is a local-first AI sidecar for school offices.
+Secure Secr-AI-tery is a local AI workspace that helps school staff turn messy context into usable drafts, summaries, and action notes on a school-controlled machine.
 
-It helps staff turn messy admin inputs into clean, review-ready outputs without defaulting to external cloud processing.
+## Why This Matters
 
----
+Schools want useful AI.
+They do not want a vague pilot, an unclear privacy story, or another expensive platform.
 
-## The Problem It Solves
+This project is intentionally simple:
 
-School administration loses time to repetitive handling:
+- one desktop layout
+- one local model host
+- one prompt library
+- one output box
+- one copy step into the next system
 
-- absence messages
-- parent communication drafts
-- phone notes
-- meeting summaries
-- document triage
-- copy-paste into legacy systems
+## What Staff Actually Do
 
-These tasks are repetitive, but they still need judgement.
+1. paste the situation into `Context, Info & 2do's`
+2. add one file if needed
+3. choose a prompt
+4. run it
+5. copy the result
 
-That is exactly where many schools want AI help.
-It is also exactly where many AI pilots become vague, risky, and hard to govern.
+That is the whole loop.
 
----
+## What The School Gets
 
-## What Staff Actually Get
+- faster drafting
+- reusable prompt standards
+- local history for repeat tasks
+- no default cloud dependency
+- no automatic outbound action
+- a clearer governance story for internal review
 
-For a typical case, the app produces:
+## Why Local-First Helps
 
-- structured facts
-- a short internal case brief
-- three subject line options
-- three tone-controlled draft replies
-- warnings where information is missing
-- clarifying questions when the message is incomplete
+Many schools do not want routine communication work to default immediately into external AI clouds.
 
-Nothing is sent automatically.
+Secure Secr-AI-tery starts from a calmer posture:
 
-Staff stay in control.
+- local app
+- local model
+- local storage
+- local review
 
----
-
-## Why This Matters for European Schools
-
-Many schools want useful AI, but they do not want:
-
-- another cloud dependency
-- another unclear vendor story
-- another subscription meter
-- another tool that creates more governance questions than value
-
-This repo is designed to reduce those concerns.
-
-It keeps the default path local:
-
-- local web app
-- local model host
-- local machine by default
-- minimal logging by default
-- no auto-send
-
-That is not a legal shortcut.
-It is a more defendable starting posture.
-
----
-
-## What Makes This Easier to Trial
-
-- one clear use case area
-- one pilot machine is enough
-- no platform migration required
-- no deep integration needed for MVP
-- synthetic fixtures included for evaluation
-- same repo works on macOS and Windows
-
-This makes it much easier to answer the question:
-
-**Does this help our school office in practice?**
-
----
+That does not make all legal questions disappear.
+It does reduce avoidable complexity at the start.
 
 ## What It Is Not
 
 It is not:
 
-- a student grading tool
+- a grading engine
 - an admissions engine
-- an automated decision-maker
-- an auto-sending bot
-- a full school platform replacement
+- an autonomous decision-maker
+- a mail bot
+- a full school platform
 
-That restraint is one reason it is easier to govern.
+## What A Good First Pilot Looks Like
 
----
+1. one machine
+2. one staff owner
+3. three saved prompts
+4. short text-first tasks
+5. clear internal review after a small trial
 
-## What a Safe First Pilot Looks Like
+## Why The Repo Is Public
 
-1. Pick one narrow workflow owner in the school office.
-2. Run the app on one dedicated local machine.
-3. Start with synthetic fixtures.
-4. Test text and digital PDF workflows first.
-5. Review outputs with staff.
-6. Decide whether the time-saving and trust profile justify a wider pilot.
+The public repo is part of the point.
 
-This avoids pilot purgatory.
+It lets schools and IT teams inspect:
 
----
+- the architecture
+- the prompts
+- the storage model
+- the tests
+- the deployment path
 
-## What Success Looks Like
+That helps build trust faster than a black-box demo.
 
-The first pilot should answer simple questions:
+## Next Step
 
-- Does this reduce repetitive admin drafting work?
-- Do staff find the outputs clear and usable?
-- Does the local-first posture increase trust?
-- Does the tool feel safe enough to discuss seriously with IT and data protection reviewers?
-
-If the answer is yes, the school can move from demo to governed pilot.
-
----
-
-## Questions to Ask Your IT and Data Protection Leads
-
-1. Can we keep the first pilot fully local on one machine?
-2. What retention rule should apply to the local SQLite data?
-3. What staff guidance is needed before real use?
-4. Do we want text-only first, or text plus OCR?
-5. Do we need a DPIA for the intended workflow scope?
-
----
-
-## Why This Repo Is Public
-
-This is a free repo because the repo itself is useful:
-
-- as a real evaluation tool
-- as a leadership demo
-- as a proof that local-first AI can look calm and credible
-
-It also acts as proof-of-work for deeper implementation, rollout, training, and adaptation services.
-
----
-
-## Suggested Next Steps
-
-- Read the [Pilot Checklist](PILOT_CHECKLIST.md)
-- Watch the repo demo path in [Demo Runbook](DEMO_RUNBOOK.md)
-- Hand technical review to the [IT Deployment Guide](IT_DEPLOYMENT.md)
-
----
-
-## Contact
-
-If you want to discuss a pilot, rollout strategy, or a school-specific adaptation:
-
-- Videocall: [calendar.app.google/ANb76KDuvg4J7LS28](https://calendar.app.google/ANb76KDuvg4J7LS28)
-- E-Mail: [Elias.Kouloures@gmail.com](mailto:Elias.Kouloures@gmail.com)
-- Website: [EliasKouloures.com](https://EliasKouloures.com)
+If leadership is interested, hand technical review to the [IT Deployment Guide](IT_DEPLOYMENT.md).

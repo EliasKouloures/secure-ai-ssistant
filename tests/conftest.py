@@ -46,6 +46,18 @@ class FakeBackend:
             },
         }
 
+    def generate_assistant_text(self, context: dict[str, object]) -> str:
+        prompt_title = str(context.get("prompt_title", "Prompt")).strip() or "Prompt"
+        context_text = str(context.get("context_text", "")).strip()
+        file_context = str(context.get("file_context", "")).strip()
+        lines = [f"{prompt_title}"]
+        if context_text:
+            lines.append(context_text)
+        if file_context and file_context != "No uploaded file context provided.":
+            lines.append(f"File context: {file_context}")
+        lines.append("Prepared locally.")
+        return "\n\n".join(lines)
+
     def ocr_image(self, image_bytes: bytes, mime_type: str, filename: str) -> VisionOCRResult:
         text = "Student: Leo Martin\nYear 4B\nAbsent on 2026-03-12 because of stomach illness."
         return VisionOCRResult(
@@ -59,7 +71,7 @@ class FakeBackend:
 @pytest.fixture()
 def app_config(tmp_path: Path) -> AppConfig:
     return AppConfig(
-        title="Sekretariat-Copilot",
+        title="Secure Secr-AI-tery",
         locale="en-GB",
         bind_host="127.0.0.1",
         bind_port=8501,
@@ -69,7 +81,7 @@ def app_config(tmp_path: Path) -> AppConfig:
             model_id="fake-local-model",
             supports_vision=True,
         ),
-        storage=StorageConfig(database_path=str(tmp_path / "sekretariat.db")),
+        storage=StorageConfig(database_path=str(tmp_path / "secure-secr-ai-tery.db")),
         limits=InputLimits(),
         features=FeatureFlags(),
     )

@@ -4,23 +4,20 @@ import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from app.components import render_copy_button
-from app.state import (
-    apply_clarification_input_clear,
-    apply_reset,
-    queue_clarification_input_clear,
-    queue_reset,
-)
 from app.styles import load_styles
 from core.config import load_config
 from core.errors import AppError
-from core.models import AnalysisPayload, AnalysisResult, ErrorCode, FileUpload, GeneratedOutputs
+from core.models import AssistantRun, ErrorCode, FileUpload
 from core.storage import Repository
-from core.text import normalise_whitespace
 from services.case_service import CaseService
 
+APP_NAME = "Secure Secr-AI-tery"
+APP_CLAIM = "Your Free, Private & Offline AI Assistant."
+ADD_NEW_PROMPT = "Add new Prompt"
+
 st.set_page_config(
-    page_title="Sekretariat-Copilot",
-    page_icon="SC",
+    page_title=APP_NAME,
+    page_icon="SS",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -35,482 +32,255 @@ def get_service() -> CaseService:
 
 def _initialise_state() -> None:
     defaults = {
-        "case_id": None,
-        "analysis": None,
-        "outputs": None,
+        "context_input": "",
+        "prompt_editor_input": "",
+        "prompt_choice": ADD_NEW_PROMPT,
+        "loaded_prompt_choice": None,
+        "pending_prompt_choice": None,
+        "output_text": "",
+        "output_editor_input": "",
+        "pending_output_sync": None,
+        "flash_message": None,
         "error_message": None,
-        "pending_payload": None,
-        "pending_analysis": None,
-        "pending_case_id": None,
-        "show_clarification_dialog": False,
-        "clarification_answers_input": "",
-        "clarification_error": None,
-        "clear_clarification_input_requested": False,
-        "pasted_text_input": "",
-        "manual_note_input": "",
         "file_uploader_nonce": 0,
-        "reset_requested": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
 
-def _build_payload(
-    *,
-    text_input: str,
-    note_input: str,
-    uploaded_files: list[UploadedFile] | None,
-    locale: str,
-) -> AnalysisPayload:
-    uploads = [
-        FileUpload(name=item.name, content=item.getvalue(), content_type=item.type)
-        for item in uploaded_files or []
-    ]
-    return AnalysisPayload(
-        text_input=text_input,
-        note_input=note_input,
-        files=uploads,
-        locale=locale,
-    )
+def _uploaded_file(item: UploadedFile | None) -> list[FileUpload]:
+    if item is None:
+        return []
+    return [FileUpload(name=item.name, content=item.getvalue(), content_type=item.type)]
 
 
-def _needs_clarification(analysis: AnalysisResult) -> bool:
-    if analysis.case.status.value == "blocked":
-        return False
-    return analysis.confidence_score < 90
-
-
-def _clarification_questions(analysis: AnalysisResult) -> list[str]:
-    questions: list[str] = []
-    for question in analysis.clarifying_questions:
-        if question and question not in questions:
-            questions.append(question)
-
-    if not questions and not analysis.extracted_record.student_name:
-        questions.append("Please confirm the pupil's full name.")
-    if not questions and analysis.case.task_type.value == "reply":
-        questions.append("What exact reply or reaction should the school office send?")
-    if not questions:
-        questions.append("What is the sender's main intent in one short sentence?")
-    if len(questions) < 5 and analysis.warnings:
-        questions.append("Please confirm any missing context, dates, or response constraints.")
-    if len(questions) < 5:
-        questions.append("Should the school office reply, and if so what outcome should that reply aim for?")
-    deduped: list[str] = []
-    for question in questions:
-        if question not in deduped:
-            deduped.append(question)
-    return deduped[:5]
-
-
-def _clear_pending_review(service: CaseService, *, remove_pending_case: bool) -> None:
-    pending_case_id = st.session_state.pending_case_id
-    if remove_pending_case and pending_case_id:
-        try:
-            service.reset_case(pending_case_id)
-        except AppError:
-            pass
-    st.session_state.pending_payload = None
-    st.session_state.pending_analysis = None
-    st.session_state.pending_case_id = None
-    st.session_state.show_clarification_dialog = False
-    queue_clarification_input_clear(st.session_state)
-    st.session_state.clarification_error = None
-
-
-def _perform_reset(service: CaseService) -> None:
-    if st.session_state.case_id:
-        try:
-            service.reset_case(st.session_state.case_id)
-        except AppError:
-            pass
-    _clear_pending_review(service, remove_pending_case=True)
-    apply_reset(st.session_state)
-
-
-def _handle_app_error(exc: AppError) -> str:
-    if exc.code == ErrorCode.BACKEND_UNREACHABLE:
-        return (
-            "The local model backend could not be reached. Please confirm that LM Studio is open, "
-            "the local server is running, and the configured model is loaded."
-        )
+def _handle_error(exc: AppError) -> str:
+    if exc.code == ErrorCode.EMPTY_INPUT:
+        return "Add some context, information, 2do's, or an uploaded file before running the prompt."
+    if exc.code == ErrorCode.INSUFFICIENT_CONTEXT:
+        return "Select or write a prompt before you run it."
     if exc.code == ErrorCode.MODEL_TIMEOUT:
         return (
             "The local model is running, but this request took too long to finish. "
-            "Please try again, shorten the request, or increase the backend timeout in `config.toml`."
+            "Try again, shorten the context, or use a shorter prompt."
+        )
+    if exc.code == ErrorCode.BACKEND_UNREACHABLE:
+        return (
+            "LM Studio could not be reached. Please confirm that the local server is running and "
+            "that the configured model is loaded."
         )
     return exc.message
 
 
-def _store_completed_case(analysis: AnalysisResult, outputs: GeneratedOutputs) -> None:
-    st.session_state.case_id = analysis.case.id
-    st.session_state.analysis = analysis
-    st.session_state.outputs = outputs
+def _load_prompt_into_state(service: CaseService, title: str) -> None:
+    prompt = service.get_prompt_template(title)
+    if prompt is None:
+        st.session_state.prompt_editor_input = ""
+        st.session_state.loaded_prompt_choice = ADD_NEW_PROMPT
+        return
+    st.session_state.loaded_prompt_choice = prompt.title
+    st.session_state.prompt_editor_input = prompt.body
+
+
+def _load_history_into_state(service: CaseService, run: AssistantRun) -> None:
+    st.session_state.context_input = run.context_text
+    st.session_state.output_text = run.output_text
+    st.session_state.output_editor_input = run.output_text
     st.session_state.error_message = None
+    st.session_state.flash_message = f"Loaded: {run.title}"
+    st.session_state.prompt_editor_input = run.prompt_body
+    if service.get_prompt_template(run.prompt_title):
+        st.session_state.prompt_choice = run.prompt_title
+        st.session_state.loaded_prompt_choice = run.prompt_title
+    else:
+        st.session_state.prompt_choice = ADD_NEW_PROMPT
+        st.session_state.loaded_prompt_choice = ADD_NEW_PROMPT
 
 
-def _analyse_and_maybe_generate(
-    service: CaseService,
-    payload: AnalysisPayload,
-    *,
-    allow_clarification: bool,
-) -> None:
-    with st.spinner("Processing locally..."):
-        analysis = service.analyse_case(payload)
-    if allow_clarification and _needs_clarification(analysis):
-        st.session_state.case_id = None
-        st.session_state.analysis = None
-        st.session_state.outputs = None
-        st.session_state.pending_payload = payload
-        st.session_state.pending_analysis = analysis
-        st.session_state.pending_case_id = analysis.case.id
-        queue_clarification_input_clear(st.session_state)
-        st.session_state.show_clarification_dialog = True
+def _apply_pending_prompt_choice(prompt_options: list[str]) -> None:
+    pending_choice = st.session_state.pending_prompt_choice
+    if pending_choice and pending_choice in prompt_options:
+        st.session_state.prompt_choice = pending_choice
+        st.session_state.loaded_prompt_choice = None
+    st.session_state.pending_prompt_choice = None
+    if st.session_state.prompt_choice not in prompt_options:
+        st.session_state.prompt_choice = ADD_NEW_PROMPT
+        st.session_state.loaded_prompt_choice = None
+
+
+def _apply_pending_output_sync() -> None:
+    pending_output = st.session_state.pending_output_sync
+    if pending_output is None:
         return
-    with st.spinner("Drafting responses locally..."):
-        outputs = service.generate_outputs(analysis.case.id, operator_note=payload.note_input)
-    _store_completed_case(analysis, outputs)
+    st.session_state.output_editor_input = pending_output
+    st.session_state.output_text = pending_output
+    st.session_state.pending_output_sync = None
 
 
-@st.dialog("Need a bit more clarity")
-def render_clarification_dialog(service: CaseService) -> None:
-    analysis = st.session_state.pending_analysis
-    payload = st.session_state.pending_payload
-    if analysis is None or payload is None:
-        return
+def _history_button_label(run: AssistantRun) -> str:
+    return run.title[:42] + ("..." if len(run.title) > 42 else "")
 
+
+def main() -> None:
+    service = get_service()
+    _initialise_state()
+
+    prompt_templates = service.list_prompt_templates()
+    prompt_options = [ADD_NEW_PROMPT, *[item.title for item in prompt_templates]]
+    _apply_pending_prompt_choice(prompt_options)
+    _apply_pending_output_sync()
+
+    st.markdown(load_styles(), unsafe_allow_html=True)
     st.markdown(
-        """
-        <div class="sc-dialog-card">
-          <div class="sc-dialog-title">I want to make sure the draft is accurate before I continue.</div>
-          <div class="sc-dialog-copy">Some parts of the message are still unclear, incomplete, or below the 90% confidence threshold. Please answer the questions below, or cancel and adjust the inputs.</div>
+        f"""
+        <div class="ssa-topbar">
+          <div class="ssa-brand-line">
+            <span class="ssa-brand">{APP_NAME}</span>
+            <span class="ssa-claim">{APP_CLAIM}</span>
+          </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    issues: list[str] = []
-    if analysis.warnings:
-        issues.extend(analysis.warnings)
-    if analysis.missing_fields:
-        issues.append(
-            "Important details are still missing: "
-            + ", ".join(field.replace("_", " ") for field in analysis.missing_fields)
-            + "."
-        )
-    if issues:
-        for issue in issues[:5]:
-            st.markdown(f'<div class="sc-warning">{issue}</div>', unsafe_allow_html=True)
+    left_col, middle_col, right_col = st.columns([1.05, 3.4, 1.45], gap="large")
 
-    st.markdown('<div class="sc-dialog-questions">Clarifying questions</div>', unsafe_allow_html=True)
-    for index, question in enumerate(_clarification_questions(analysis), start=1):
-        st.markdown(f"**{index}.** {question}")
-
-    answers = st.text_area(
-        "Clarifying answers",
-        key="clarification_answers_input",
-        height=150,
-        placeholder="Type any missing names, dates, intent, response goals, or constraints here.",
-    )
-
-    if st.session_state.clarification_error:
-        st.markdown(
-            f'<div class="sc-error">{st.session_state.clarification_error}</div>',
-            unsafe_allow_html=True,
-        )
-
-    cancel_col, submit_col = st.columns(2)
-    with cancel_col:
-        if st.button("Cancel process", width="stretch"):
-            _clear_pending_review(service, remove_pending_case=True)
-            st.session_state.error_message = "The process was cancelled. You can adjust the inputs and try again."
-            st.rerun()
-    with submit_col:
-        if st.button("Submit answers", type="primary", width="stretch"):
-            if not answers.strip():
-                st.session_state.clarification_error = (
-                    "Please add at least one clarification before submitting."
-                )
-                st.rerun()
-
-            amended_note = normalise_whitespace(
-                "\n\n".join(
-                    filter(
-                        None,
-                        [
-                            payload.note_input,
-                            "Clarification answers:\n" + answers.strip(),
-                        ],
-                    )
-                )
-            )
-            updated_payload = AnalysisPayload(
-                text_input=payload.text_input,
-                note_input=amended_note,
-                files=payload.files,
-                locale=payload.locale,
-            )
-            st.session_state.manual_note_input = amended_note
-            _clear_pending_review(service, remove_pending_case=True)
-            try:
-                _analyse_and_maybe_generate(service, updated_payload, allow_clarification=True)
-            except AppError as exc:
-                st.session_state.error_message = _handle_app_error(exc)
-            st.rerun()
-
-
-def main() -> None:
-    service = get_service()
-    config = service.config
-    st.markdown(load_styles(), unsafe_allow_html=True)
-    _initialise_state()
-
-    if st.session_state.reset_requested:
-        _perform_reset(service)
-    if st.session_state.clear_clarification_input_requested:
-        apply_clarification_input_clear(st.session_state)
-
-    if st.session_state.show_clarification_dialog:
-        render_clarification_dialog(service)
-
-    health = service.health_check()
-    today_count = service.repository.count_cases_today()
-
-    hero_left, hero_right = st.columns([3, 1])
-    with hero_left:
-        st.markdown('<div class="sc-hero">', unsafe_allow_html=True)
-        st.markdown('<div class="sc-headline">Sekretariat-Copilot</div>', unsafe_allow_html=True)
-        status_label = "Local backend ready" if health.reachable else "Backend offline"
-        st.markdown(
-            f'<div class="sc-status-pill">{status_label}</div>',
-            unsafe_allow_html=True,
-        )
-        if health.warnings:
-            for warning in health.warnings:
-                st.markdown(f'<div class="sc-warning">{warning}</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<p class="sc-muted">Privacy-first administrative support for school office workflows.</p>',
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-    with hero_right:
-        st.markdown(
-            f"""
-            <div class="sc-kpi">
-              <div class="sc-panel-title">Cases processed today</div>
-              <div class="sc-kpi-value">{today_count}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    left_col, right_col = st.columns(2, gap="large")
     with left_col:
-        st.markdown('<div class="sc-panel-title">Inputs</div>', unsafe_allow_html=True)
-        text_input = st.text_area(
-            "Paste the message you received into here",
-            key="pasted_text_input",
-            height=280,
-            placeholder="Paste the message you received into here",
-        )
-        note_input = st.text_area(
-            "Paste and/or write a reaction and/or response to above message",
-            key="manual_note_input",
-            height=140,
-            placeholder="Paste and/or write a reaction and/or response to above message",
-        )
-        uploader_key = f"supporting_files_input_{st.session_state.file_uploader_nonce}"
-        uploaded_files = st.file_uploader(
-            "Upload additional context for your reaction and/or response to above message",
-            type=["pdf", "png", "jpg", "jpeg"],
-            accept_multiple_files=True,
-            key=uploader_key,
-        )
-        action_col, reset_col = st.columns([2, 1])
-        with action_col:
-            process = st.button("Process locally", type="primary", width="stretch")
-        with reset_col:
-            reset = st.button("Reset case", width="stretch")
+        st.markdown('<div class="ssa-panel ssa-history-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-panel-title">History</div>', unsafe_allow_html=True)
+        history_items = service.list_history(limit=18)
+        if not history_items:
+            st.markdown(
+                '<p class="ssa-muted">Past chats will appear here once you have run a prompt.</p>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown('<div class="ssa-history-list">', unsafe_allow_html=True)
+            for item in history_items:
+                if st.button(
+                    _history_button_label(item),
+                    key=f"history_{item.id}",
+                    width="stretch",
+                    help=item.preview,
+                ):
+                    _load_history_into_state(service, item)
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        if reset:
-            queue_reset(st.session_state)
-            st.rerun()
+    with middle_col:
+        st.markdown('<div class="ssa-panel ssa-main-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-panel-title">Context, Info & 2do\'s</div>', unsafe_allow_html=True)
+        context_text = st.text_area(
+            "Context, Info & 2do's",
+            key="context_input",
+            height=240,
+            label_visibility="collapsed",
+            placeholder="Type or paste the details for this task here.",
+        )
 
-        if process:
+        action_left, action_right = st.columns(2, gap="large")
+        with action_left:
+            st.markdown('<div class="ssa-upload-field">', unsafe_allow_html=True)
+            uploaded_file = st.file_uploader(
+                "Upload File",
+                type=["pdf", "png", "jpg", "jpeg"],
+                accept_multiple_files=False,
+                key=f"workspace_file_{st.session_state.file_uploader_nonce}",
+                label_visibility="collapsed",
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+        with action_right:
+            run_prompt = st.button("Run Prompt", type="primary", width="stretch")
+
+        if run_prompt:
+            st.session_state.flash_message = None
             st.session_state.error_message = None
-            payload = _build_payload(
-                text_input=text_input,
-                note_input=note_input,
-                uploaded_files=uploaded_files,
-                locale=config.locale,
+            current_choice = st.session_state.prompt_choice
+            selected_prompt_title = (
+                current_choice if current_choice != ADD_NEW_PROMPT else ""
             )
             try:
-                _analyse_and_maybe_generate(service, payload, allow_clarification=True)
-                if st.session_state.show_clarification_dialog:
-                    st.rerun()
+                run = service.run_prompt(
+                    context_text=context_text,
+                    prompt_title=selected_prompt_title,
+                    prompt_body=st.session_state.prompt_editor_input,
+                    files=_uploaded_file(uploaded_file),
+                )
+                st.session_state.output_text = run.output_text
+                st.session_state.output_editor_input = run.output_text
+                st.session_state.flash_message = "Prompt completed locally."
             except AppError as exc:
-                st.session_state.analysis = None
-                st.session_state.outputs = None
-                st.session_state.error_message = _handle_app_error(exc)
+                st.session_state.error_message = _handle_error(exc)
 
         if st.session_state.error_message:
             st.markdown(
-                f'<div class="sc-error">{st.session_state.error_message}</div>',
+                f'<div class="ssa-error">{st.session_state.error_message}</div>',
                 unsafe_allow_html=True,
             )
-        elif st.session_state.analysis is None and st.session_state.pending_analysis is None:
+        elif st.session_state.flash_message:
             st.markdown(
-                '<p class="sc-muted">Paste the inbound message, add your intended reaction if needed, upload supporting context if useful, then process locally.</p>',
+                f'<div class="ssa-message">{st.session_state.flash_message}</div>',
                 unsafe_allow_html=True,
             )
+
+        st.markdown('<div class="ssa-panel-title ssa-panel-title-output">AI Output</div>', unsafe_allow_html=True)
+        output_text = st.text_area(
+            "AI Output",
+            key="output_editor_input",
+            height=320,
+            label_visibility="collapsed",
+            placeholder="The local model output will appear here.",
+        )
+        st.session_state.output_text = output_text
+
+        output_left, output_right = st.columns(2, gap="large")
+        with output_left:
+            if st.button("Delete Output", width="stretch"):
+                st.session_state.pending_output_sync = ""
+                st.session_state.error_message = None
+                st.session_state.flash_message = "Output deleted."
+                st.rerun()
+        with output_right:
+            render_copy_button("Copy Output", output_text)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with right_col:
-        st.markdown('<div class="sc-panel-title">Ready-to-use outputs</div>', unsafe_allow_html=True)
-        analysis = st.session_state.analysis
-        outputs = st.session_state.outputs
-        if analysis and outputs:
-            st.markdown(
-                '<p class="sc-muted">Pick the version that fits best, edit if needed, and copy it into your school email or admin system.</p>',
-                unsafe_allow_html=True,
-            )
-            if analysis.case.status.value == "blocked":
-                st.markdown(
-                    '<div class="sc-warning">Unsupported input. Review the guidance below and ask for a clearer single-child case.</div>',
-                    unsafe_allow_html=True,
-                )
-            elif analysis.case.confidence and analysis.case.confidence.value == "low":
-                st.markdown(
-                    '<div class="sc-warning">Low confidence. Review carefully before using any output.</div>',
-                    unsafe_allow_html=True,
-                )
-
-            for warning in analysis.warnings:
-                st.markdown(f'<div class="sc-warning">{warning}</div>', unsafe_allow_html=True)
-
-            st.subheader("Structured facts")
-            edited_facts = st.text_area(
-                "Structured facts",
-                value="\n".join(
-                    f"{key.replace('_', ' ').title()}: {value}"
-                    for key, value in analysis.extracted_record.as_display_dict().items()
-                ),
-                height=220,
-                label_visibility="collapsed",
-            )
-            render_copy_button("Copy structured facts", edited_facts)
-
-            st.subheader("Internal case brief")
-            brief_text = st.text_area(
-                "Internal case brief",
-                value=outputs.case_brief.summary,
-                height=160,
-                label_visibility="collapsed",
-            )
-            render_copy_button("Copy internal brief", brief_text)
-
-            if outputs.reply_set:
-                st.subheader("Subject line options")
-                subjects_text = st.text_area(
-                    "Subject line options",
-                    value=outputs.copy_blocks["Subject lines"],
-                    height=120,
-                    label_visibility="collapsed",
-                )
-                render_copy_button("Copy subject line options", subjects_text)
-                variants = [
-                    ("Hemingway response", outputs.reply_set.variant_hemingway),
-                    ("Corporate response", outputs.reply_set.variant_corporate),
-                    ("Empathic response", outputs.reply_set.variant_educator),
-                ]
-                for label, value in variants:
-                    st.subheader(label)
-                    variant_text = st.text_area(
-                        label, value=value, height=160, label_visibility="collapsed"
-                    )
-                    render_copy_button(f"Copy {label.lower()}", variant_text)
-
-            with st.expander("Download case files", expanded=False):
-                for export_format in ("text", "json", "csv"):
-                    content, filename = service.export_case(analysis.case.id, export_format)
-                    st.download_button(
-                        label=f"Download {export_format.upper()}",
-                        data=content,
-                        file_name=filename,
-                        width="stretch",
-                    )
-        else:
-            st.markdown(
-                '<p class="sc-muted">Your structured facts, internal brief, subject lines, and draft responses will appear here once the case is ready.</p>',
-                unsafe_allow_html=True,
-            )
-
-    chart_col, list_col = st.columns(2, gap="large")
-    with chart_col:
-        st.markdown(
-            '<div class="sc-panel-title">Cases by Workflow (7 Days)</div>', unsafe_allow_html=True
+        st.markdown('<div class="ssa-panel ssa-prompt-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-panel-title">Prompts</div>', unsafe_allow_html=True)
+        choice = st.selectbox(
+            "Prompts",
+            options=prompt_options,
+            key="prompt_choice",
+            label_visibility="collapsed",
         )
-        chart_rows = [
-            {"day": item.day.isoformat(), "workflow": item.task_type.value, "count": item.count}
-            for item in service.repository.workflow_counts(7)
-        ]
-        if chart_rows:
-            st.vega_lite_chart(
-                {
-                    "data": {"values": chart_rows},
-                    "mark": {"type": "bar", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4},
-                    "encoding": {
-                        "x": {"field": "day", "type": "ordinal", "title": None},
-                        "y": {"field": "count", "type": "quantitative", "title": None},
-                        "color": {
-                            "field": "workflow",
-                            "type": "nominal",
-                            "scale": {"range": ["#003399", "#2E8B57", "#708090", "#D4AF37"]},
-                        },
-                    },
-                    "height": 280,
-                },
-                width="stretch",
-            )
-        else:
-            st.markdown('<p class="sc-muted">No cases yet.</p>', unsafe_allow_html=True)
+        if choice != st.session_state.loaded_prompt_choice:
+            if choice == ADD_NEW_PROMPT:
+                st.session_state.prompt_editor_input = ""
+                st.session_state.loaded_prompt_choice = ADD_NEW_PROMPT
+            else:
+                _load_prompt_into_state(service, choice)
 
-    with list_col:
-        st.markdown('<div class="sc-panel-title">Recent cases</div>', unsafe_allow_html=True)
-        recent = service.repository.list_recent_cases(7)
-        if recent:
-            for item in recent:
-                confidence = item.confidence.value if item.confidence else "pending"
-                st.markdown(
-                    f"**{item.id}**  \n"
-                    f"{item.task_type.value.title()} | {confidence.title()} | {item.status.value.replace('_', ' ').title()}  \n"
-                    f"<span class='sc-muted'>{item.created_at.strftime('%d %b %Y %H:%M UTC')}</span>",
-                    unsafe_allow_html=True,
-                )
-                st.divider()
-        else:
-            st.markdown('<p class="sc-muted">No recent cases yet.</p>', unsafe_allow_html=True)
-
-    with st.expander("Diagnostics", expanded=False):
-        st.write(
-            {
-                "reachable": health.reachable,
-                "backend_name": health.backend_name,
-                "base_url": health.base_url,
-                "model_id": health.model_id,
-                "recent_errors": service.repository.recent_errors(),
-            }
+        prompt_body = st.text_area(
+            "Selected Prompt",
+            key="prompt_editor_input",
+            height=660,
+            label_visibility="collapsed",
+            placeholder="Select a prompt from the menu above, or choose Add new Prompt and write one here.",
         )
-        if config.features.show_privacy_panel:
-            st.markdown(
-                "Processing happens locally by default. The app binds to `127.0.0.1` unless you deliberately enable intranet mode, "
-                "stores only minimal audit metadata, and does not log raw source content by default."
+        if st.button("Save Prompt", width="stretch"):
+            saved_prompt = service.save_prompt_template(
+                prompt_body,
+                selected_title=None if choice == ADD_NEW_PROMPT else choice,
             )
-        if config.bind_host != "127.0.0.1":
-            st.markdown(
-                '<div class="sc-warning">Intranet mode is enabled. Confirm that access is restricted to your trusted local network.</div>',
-                unsafe_allow_html=True,
-            )
+            st.session_state.pending_prompt_choice = saved_prompt.title
+            st.session_state.loaded_prompt_choice = None
+            st.session_state.flash_message = f"Prompt saved: {saved_prompt.title}"
+            st.session_state.error_message = None
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

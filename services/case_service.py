@@ -3,17 +3,21 @@ from __future__ import annotations
 import hashlib
 from datetime import UTC, datetime
 from time import perf_counter
+from uuid import uuid4
 
 from core.config import AppConfig
 from core.errors import AppError
 from core.models import (
     AnalysisPayload,
     AnalysisResult,
+    AssistantRun,
     AuditEvent,
     ErrorCode,
     ExportFormat,
+    FileUpload,
     GeneratedOutputs,
     HealthCheckResult,
+    PromptTemplate,
     SourceMode,
     utc_now,
 )
@@ -24,6 +28,7 @@ from services.backend import BackendClient, OpenAICompatibleBackend
 from services.exports import ExportService
 from services.files import FileIngestService
 from services.outputs import OutputContext, OutputService
+from services.prompt_library import PromptLibraryService
 from services.prompt_loader import PromptLoader
 
 
@@ -41,6 +46,9 @@ class CaseService:
         self.file_service = FileIngestService(config.limits)
         self.output_service = OutputService(self.backend)
         self.export_service = ExportService()
+        self.prompt_library = PromptLibraryService(
+            library_path=self.repository.database_path.parent / "prompt_library.json",
+        )
 
     def health_check(self) -> HealthCheckResult:
         return self.backend.health_check()
@@ -154,6 +162,83 @@ class CaseService:
             raise AppError(ErrorCode.CASE_NOT_FOUND, "The requested case could not be found.")
         return {"reset": True}
 
+    def run_prompt(
+        self,
+        *,
+        context_text: str,
+        prompt_title: str,
+        prompt_body: str,
+        files: list[FileUpload] | None = None,
+    ) -> AssistantRun:
+        start = perf_counter()
+        typed_context = normalise_whitespace(context_text or "")
+        parsed_files = self.file_service.ingest(
+            files or [],
+            backend=self.backend,
+            supports_vision=self.config.backend.supports_vision,
+        ) if files else None
+        file_context = normalise_whitespace(parsed_files.combined_text) if parsed_files else ""
+        cleaned_prompt = prompt_body.strip()
+
+        if not typed_context and not file_context:
+            self._audit_error(None, ErrorCode.EMPTY_INPUT, start, {"mode": "run_prompt"})
+            raise AppError(
+                ErrorCode.EMPTY_INPUT,
+                "Please add context, information, 2do's, or an uploaded file before running the prompt.",
+            )
+        if not cleaned_prompt:
+            self._audit_error(None, ErrorCode.INSUFFICIENT_CONTEXT, start, {"mode": "run_prompt"})
+            raise AppError(
+                ErrorCode.INSUFFICIENT_CONTEXT,
+                "Please select or write a prompt before running it.",
+            )
+
+        output_text = self.backend.generate_assistant_text(
+            {
+                "prompt_title": prompt_title or self.prompt_library.derive_title(cleaned_prompt),
+                "prompt_body": cleaned_prompt,
+                "context_text": typed_context or "No typed context provided.",
+                "file_context": file_context or "No uploaded file context provided.",
+            }
+        )
+        run = AssistantRun(
+            id=f"run_{uuid4().hex[:12]}",
+            title=self._history_title(prompt_title, typed_context, cleaned_prompt),
+            preview=self._history_preview(output_text),
+            context_text=typed_context,
+            prompt_title=prompt_title or self.prompt_library.derive_title(cleaned_prompt),
+            prompt_body=cleaned_prompt,
+            output_text=output_text,
+            source_files=[asset.filename or "" for asset in (parsed_files.assets if parsed_files else []) if asset.filename],
+        )
+        self.repository.insert_assistant_run(run)
+        self.repository.insert_audit_event(
+            AuditEvent(
+                id=f"audit_{hashlib.sha1((run.id + 'prompt').encode(), usedforsecurity=False).hexdigest()[:12]}",
+                case_id=None,
+                event_type="run_prompt",
+                timestamp=utc_now(),
+                duration_ms=int((perf_counter() - start) * 1000),
+                metadata_json={"prompt_title": run.prompt_title, "source_files": run.source_files},
+            )
+        )
+        return run
+
+    def list_history(self, limit: int = 30) -> list[AssistantRun]:
+        return self.repository.list_assistant_runs(limit)
+
+    def get_history_item(self, run_id: str) -> AssistantRun | None:
+        return self.repository.get_assistant_run(run_id)
+
+    def list_prompt_templates(self) -> list[PromptTemplate]:
+        return self.prompt_library.list_prompts()
+
+    def get_prompt_template(self, title: str) -> PromptTemplate | None:
+        return self.prompt_library.get_prompt(title)
+
+    def save_prompt_template(self, prompt_body: str, selected_title: str | None = None) -> PromptTemplate:
+        return self.prompt_library.save_prompt(prompt_body, selected_title=selected_title)
+
     def _audit_error(self, case_id: str | None, code: str, start: float, metadata: dict[str, object]) -> None:
         self.repository.insert_audit_event(
             AuditEvent(
@@ -175,3 +260,16 @@ class CaseService:
         if payload.note_input:
             return SourceMode.NOTE
         return SourceMode.TEXT
+
+    def _history_title(self, prompt_title: str, context_text: str, prompt_body: str) -> str:
+        basis = prompt_title.strip() or self.prompt_library.derive_title(prompt_body)
+        topic_source = context_text.strip().splitlines()[0] if context_text.strip() else basis
+        topic_words = " ".join(topic_source.split()[:6]).strip(" ,.-")
+        if not topic_words:
+            return basis
+        if topic_words.lower() == basis.lower():
+            return basis
+        return f"{basis}: {topic_words}"
+
+    def _history_preview(self, output_text: str) -> str:
+        return " ".join(output_text.split())[:96].strip() or "No output yet"

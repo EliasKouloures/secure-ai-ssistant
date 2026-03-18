@@ -254,3 +254,22 @@ class StoredCaseBundle:
     case_brief: CaseBrief | None
     clarifying_questions: list[ClarifyingQuestion]
 
+
+@dataclass(slots=True)
+class PromptTemplate:
+    title: str
+    body: str
+    updated_at: datetime = field(default_factory=utc_now)
+
+
+@dataclass(slots=True)
+class AssistantRun:
+    id: str
+    title: str
+    preview: str
+    context_text: str
+    prompt_title: str
+    prompt_body: str
+    output_text: str
+    source_files: list[str] = field(default_factory=list)
+    created_at: datetime = field(default_factory=utc_now)

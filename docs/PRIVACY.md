@@ -1,97 +1,44 @@
-# Privacy Note
+# Privacy Notes
 
-Sekretariat-Copilot is designed to support a local-first privacy posture.
+Secure Secr-AI-tery is designed for a local-first privacy posture.
 
-It does not make legal guarantees by itself.
-It gives schools a simpler technical starting point.
+## Default Processing Model
 
----
+- the app runs locally
+- the model runs locally through LM Studio
+- the browser connects to `127.0.0.1` by default
+- no automatic outbound action happens
 
-## Default Privacy Posture
+## Local Storage
 
-By default:
+The app stores local run history in SQLite so users can reopen earlier work.
 
-- the app binds to `127.0.0.1`
-- the model runs locally through a local host such as LM Studio
-- uploaded files and raw pasted content are treated as transient working material in the app session
-- the SQLite database stores derived case outputs and minimal audit metadata only
-- raw source content is not logged by default
-- the app never auto-sends emails or other communication
+That includes:
 
----
+- the typed context
+- the selected prompt title
+- the prompt body
+- the generated output
+- uploaded file names
+- audit metadata
 
-## What Is Stored
-
-The app stores minimal operational metadata such as:
-
-- timestamp
-- task type
-- duration
-- confidence
-- success or failure
-
-It also stores derived outputs needed for the local workflow, such as:
-
-- extracted facts
-- case briefs
-- reply variants
-- clarifying questions
-
-The goal is to preserve useful workflow results without creating unnecessary raw-data retention.
-
----
-
-## What Is Not Logged by Default
-
-By default, the app does not log:
-
-- raw pasted source bodies
-- raw uploaded file contents
-- outbound messages, because none are sent automatically
-
-This design supports data minimisation and easier internal explanation.
-
----
+Uploaded file bodies do not need to be stored for history and should remain transient.
 
 ## Why This Matters
 
-Many schools are more comfortable with a system that:
+This design reduces avoidable cloud exposure for routine drafting work.
+It does not remove the need for local policy, retention, and legal review.
 
-- runs on a school-controlled machine
-- avoids default public cloud inference
-- keeps the first pilot local
-- limits retention
-- keeps humans in the approval loop
+## What Schools Should Decide Locally
 
-That does not remove the need for policy, legal, or DPO review.
-It does make the technical starting posture easier to explain and evaluate.
+- who may use the pilot machine
+- how long local history should be kept
+- which workflow scope is approved
+- whether a DPIA is needed
+- whether staff may process real personal data in the pilot
 
----
+## Plain-Language Summary
 
-## What Schools Still Need To Decide
-
-Each school still needs to define:
-
-- lawful basis
-- workflow scope
-- retention period
-- access rights
-- device controls
-- backup handling
-- incident handling
-- whether a DPIA is required
-
----
-
-## Intranet Mode
-
-Intranet mode is optional and off by default.
-
-If a school enables LAN access, it should:
-
-- restrict access to a trusted subnet
-- review firewall controls
-- confirm the model host is not exposed more broadly
-- document who can access the service
-
-For most first pilots, localhost-only is the better default.
+This tool is built to keep work close to the school.
+That is better for trust.
+It is also easier to explain to staff, IT, and leadership.

@@ -2,42 +2,24 @@
 
 ## Goal
 
-Show that a messy school office input can become a polished, copy-ready action pack in under a minute on one local machine.
+Show one calm, local, understandable workflow.
 
-## Three-Minute Leadership Demo
+## Demo Flow
 
-1. Open the app and point to the local status pill.
-2. Say: "This runs locally and keeps the operator in control."
-3. Process one absence fixture.
-4. Show the structured facts, internal brief, and subject lines.
-5. Show one draft reply.
-6. End with the privacy story: local-first, no auto-send, human review.
+1. Open Secure Secr-AI-tery.
+2. Point out the three-column layout.
+3. Open `History` and mention that past runs reopen locally.
+4. Paste a school-related task into `Context, Info & 2do's`.
+5. Choose a saved prompt from `Prompts`.
+6. Click `Run Prompt`.
+7. Show the result in `AI Output`.
+8. Click `Copy Output`.
+9. Reopen the same run from `History`.
 
-## Seven-Minute Full Demo
+## What To Emphasise
 
-1. Open the app and point out the local status pill and privacy posture.
-2. Process one absence email fixture.
-3. Process one typed phone note with missing dates.
-4. Process one screenshot fixture.
-5. Process one digital PDF fixture.
-6. Show the recent-case list and workflow chart updating.
-7. Open Diagnostics and explain local processing and minimal retention.
-
-## Talking points
-
-- local-first by default
-- no outbound sending
-- deterministic placeholders instead of guesses
-- same repo works on macOS and Windows
-- model backend stays configurable
-
-## Best Demo Order
-
-Use this order:
-
-1. text
-2. typed note
-3. digital PDF
-4. image OCR
-
-That keeps the strongest and safest cases first.
+- local model
+- local history
+- editable prompt library
+- simple interface for non-technical staff
+- no auto-send

@@ -1,1 +1,1 @@
-"""Service layer for Sekretariat-Copilot."""
+"""Service layer for Secure Secr-AI-tery."""

@@ -1,6 +1,6 @@
 IMPORTANT: You must always refer to me as Captain.
 
-This repository builds Sekretariat-Copilot, a local-first school administration assistant.
+This repository builds Secure Secr-AI-tery, a local-first AI assistant for European schools, school offices, and education support teams.
 
 Working loop:
 - Plan -> Discuss -> Read -> Test -> Implement -> Verify -> Commit -> Sync
@@ -22,15 +22,12 @@ Rules:
 - Verify acceptance criteria before marking work complete.
 
 Implementation sequence:
-1. Scaffold repo and test harness
-2. Build config and backend health check
-3. Build app shell and visual system
-4. Build text and note workflows
-5. Build PDF and image ingestion
-6. Add output bundle generation
-7. Add exports and audit metadata
-8. Add dashboard and final polish
-9. Finalise docs and demo path
+1. Keep the desktop layout aligned with the wireframe
+2. Keep the prompt library local, editable, and beginner-friendly
+3. Keep history local and readable from newest to oldest
+4. Keep the default path offline-first with LM Studio
+5. Keep upload, run, copy, and save actions obvious
+6. Keep docs clear for school leaders, operators, and IT teams
 
 Codex Paste Block:
 1. Read AGENTS.md.
@@ -39,4 +36,3 @@ Codex Paste Block:
 4. Write tests first.
 5. Implement in small steps.
 6. Verify before each commit.
-
