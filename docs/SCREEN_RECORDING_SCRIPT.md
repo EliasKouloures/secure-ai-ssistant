@@ -1,6 +1,6 @@
 # Screen Recording Script
 
-1. Open the app and pause on the title bar: `Secure Secr-AI-tery. Your Free, Private & Offline AI Assistant.`
+1. Open the app and pause on the title bar: `Secure-Secr-AI-tery. Your Free, Private & Offline AI Assistant.`
 2. Move to `History` and say that previous local runs are sorted newest first.
 3. Paste a realistic school task into `Context, Info & 2do's`.
 4. Open `Prompts`, choose a saved prompt, and show the full prompt loading on the right.

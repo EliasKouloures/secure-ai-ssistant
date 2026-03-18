@@ -44,7 +44,7 @@ class FeatureFlags:
 
 @dataclass(slots=True)
 class AppConfig:
-    title: str = "Secure Secr-AI-tery"
+    title: str = "Secure-Secr-AI-tery"
     locale: str = "en-GB"
     bind_host: str = "127.0.0.1"
     bind_port: int = 8501
@@ -142,7 +142,7 @@ def load_config(path: str | Path | None = None, env: Mapping[str, str] | None = 
         show_privacy_panel=_coerce_bool(features_section.get("show_privacy_panel", True)),
     )
     return AppConfig(
-        title=str(app_section.get("title", "Secure Secr-AI-tery")),
+        title=str(app_section.get("title", "Secure-Secr-AI-tery")),
         locale=str(app_section.get("locale", "en-GB")),
         bind_host=str(app_section.get("bind_host", "127.0.0.1")),
         bind_port=_coerce_int(app_section.get("bind_port", 8501)),

@@ -6,7 +6,7 @@ Show one calm, local, understandable workflow.
 
 ## Demo Flow
 
-1. Open Secure Secr-AI-tery.
+1. Open Secure-Secr-AI-tery.
 2. Point out the three-column layout.
 3. Open `History` and mention that past runs reopen locally.
 4. Paste a school-related task into `Context, Info & 2do's`.

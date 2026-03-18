@@ -4,7 +4,7 @@ This is the fast briefing for principals, governors, leadership teams, and schoo
 
 ## In One Line
 
-Secure Secr-AI-tery is a local AI workspace that helps school staff turn messy context into usable drafts, summaries, and action notes on a school-controlled machine.
+Secure-Secr-AI-tery is a local AI workspace that helps school staff turn messy context into usable drafts, summaries, and action notes on a school-controlled machine.
 
 ## Why This Matters
 
@@ -43,7 +43,7 @@ That is the whole loop.
 
 Many schools do not want routine communication work to default immediately into external AI clouds.
 
-Secure Secr-AI-tery starts from a calmer posture:
+Secure-Secr-AI-tery starts from a calmer posture:
 
 - local app
 - local model

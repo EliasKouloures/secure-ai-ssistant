@@ -1,8 +1,8 @@
-# Secure Secr-AI-tery Product Brief
+# Secure-Secr-AI-tery Product Brief
 
 ## Product
 
-Secure Secr-AI-tery is a private, offline-friendly AI workspace for European schools and school support teams.
+Secure-Secr-AI-tery is a private, offline-friendly AI workspace for European schools and school support teams.
 
 ## Core UX
 

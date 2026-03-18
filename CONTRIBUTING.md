@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in Sekretariat-Copilot.
+Thank you for your interest in Secure-Secr-AI-tery.
 
 This project is public because it is both a useful local-first tool and a proof-of-work repository.
 

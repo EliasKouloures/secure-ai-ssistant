@@ -11,7 +11,7 @@ from core.models import AssistantRun, ErrorCode, FileUpload
 from core.storage import Repository
 from services.case_service import CaseService
 
-APP_NAME = "Secure Secr-AI-tery"
+APP_NAME = "Secure-Secr-AI-tery"
 APP_CLAIM = "Your Free, Private & Offline AI Assistant."
 ADD_NEW_PROMPT = "Add new Prompt"
 

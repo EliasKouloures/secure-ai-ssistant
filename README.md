@@ -1,10 +1,10 @@
-# Secure Secr-AI-tery
+# Secure-Secr-AI-tery
 
-![Secure Secr-AI-tery banner](docs/assets/sekretariat-copilot-banner.png)
+![Secure-Secr-AI-tery banner](docs/assets/secure-secr-ai-tery-banner.png)
 
 **Your Free, Private & Offline AI Assistant.**
 
-Secure Secr-AI-tery is a calm local workspace for school offices, school leaders, educators, and support teams.
+Secure-Secr-AI-tery is a calm local workspace for school offices, school leaders, educators, and support teams.
 
 It gives staff one clean screen for three things:
 
@@ -54,7 +54,7 @@ Most of that work is not complex.
 It is repetitive.
 It still needs judgement.
 
-Secure Secr-AI-tery helps staff:
+Secure-Secr-AI-tery helps staff:
 
 - draft calm replies
 - summarise meetings
@@ -204,7 +204,7 @@ Recommended LM Studio inference settings are documented in the [IT Deployment Gu
 - It is designed for human-reviewed drafting, not autonomous action.
 - Uploaded files are single-file in the current UI by design, to keep the workflow simple.
 - Prompt titles for new prompts are derived automatically from the first non-empty line.
-- The GitHub repo name still says `Sekretariat-Copilot` for continuity, even though the app is now branded `Secure Secr-AI-tery`.
+- The GitHub repo slug is `secure-secr-ai-tery`, while the visible product name is `Secure-Secr-AI-tery`.
 
 ## Related Documents
 

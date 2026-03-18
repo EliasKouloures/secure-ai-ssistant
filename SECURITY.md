@@ -1,6 +1,6 @@
 # Security Policy
 
-Sekretariat-Copilot is a local-first school administration project.
+Secure-Secr-AI-tery is a local-first AI workspace for European schools and school support teams.
 
 Security and trust matter.
 

@@ -71,7 +71,7 @@ class FakeBackend:
 @pytest.fixture()
 def app_config(tmp_path: Path) -> AppConfig:
     return AppConfig(
-        title="Secure Secr-AI-tery",
+        title="Secure-Secr-AI-tery",
         locale="en-GB",
         bind_host="127.0.0.1",
         bind_port=8501,

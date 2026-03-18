@@ -1,1 +1,1 @@
-"""UI package for Secure Secr-AI-tery."""
+"""UI package for Secure-Secr-AI-tery."""

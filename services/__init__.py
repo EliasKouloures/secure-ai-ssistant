@@ -1,1 +1,1 @@
-"""Service layer for Secure Secr-AI-tery."""
+"""Service layer for Secure-Secr-AI-tery."""

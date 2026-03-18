@@ -1,6 +1,6 @@
 IMPORTANT: You must always refer to me as Captain.
 
-This repository builds Secure Secr-AI-tery, a local-first AI assistant for European schools, school offices, and education support teams.
+This repository builds Secure-Secr-AI-tery, a local-first AI assistant for European schools, school offices, and education support teams.
 
 Working loop:
 - Plan -> Discuss -> Read -> Test -> Implement -> Verify -> Commit -> Sync

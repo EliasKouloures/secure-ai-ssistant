@@ -1,6 +1,6 @@
 # Privacy Notes
 
-Secure Secr-AI-tery is designed for a local-first privacy posture.
+Secure-Secr-AI-tery is designed for a local-first privacy posture.
 
 ## Default Processing Model
 
