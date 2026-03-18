@@ -188,7 +188,8 @@ def main() -> None:
                     label_visibility="collapsed",
                 )
         with action_right:
-            run_prompt = st.button("Run Prompt", type="primary", width="stretch")
+            with st.container(key="run_prompt_shell"):
+                run_prompt = st.button("Run Prompt", type="primary", width="stretch")
 
         if run_prompt:
             st.session_state.flash_message = None

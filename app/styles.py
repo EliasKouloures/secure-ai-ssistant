@@ -226,6 +226,34 @@ def load_styles() -> str:
         color: rgba(244, 244, 249, 0.98) !important;
     }
 
+    .st-key-run_prompt_shell .stButton > button,
+    .st-key-run_prompt_shell .stButton > button:hover,
+    .st-key-run_prompt_shell .stButton > button:focus,
+    .st-key-run_prompt_shell .stButton > button:active {
+        min-height: 60px !important;
+        border-radius: 22px !important;
+        border: 2px solid rgba(0, 51, 153, 0.98) !important;
+        background: linear-gradient(180deg, rgba(0, 51, 153, 0.98), rgba(10, 25, 47, 0.98)) !important;
+        color: rgba(244, 244, 249, 0.98) !important;
+        box-shadow: none !important;
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em !important;
+        padding: 0 18px !important;
+        font-family: "Aptos", "Segoe UI", sans-serif !important;
+    }
+
+    .st-key-run_prompt_shell .stButton > button p,
+    .st-key-run_prompt_shell .stButton > button:hover p,
+    .st-key-run_prompt_shell .stButton > button:focus p,
+    .st-key-run_prompt_shell .stButton > button:active p {
+        color: rgba(244, 244, 249, 0.98) !important;
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        font-family: "Aptos", "Segoe UI", sans-serif !important;
+    }
+
     .st-key-history_cards .stButton > button,
     .st-key-history_cards button[kind="secondary"],
     .st-key-history_cards button[kind="secondary"]:hover,
