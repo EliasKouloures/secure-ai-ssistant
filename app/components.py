@@ -14,18 +14,19 @@ def render_copy_button(label: str, value: str) -> None:
     components.html(
         f"""
         <button id="{button_id}" style="
-            border-radius:24px;
+            border-radius:22px;
             border:2px solid rgba(10,25,47,0.82);
             background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,244,249,0.9));
             color:#0A192F;
             font-family:IBM Plex Sans, Segoe UI, sans-serif;
             font-size:22px;
             font-weight:700;
-            padding:16px 18px;
+            padding:0 18px;
             cursor:pointer;
             width:100%;
-            min-height:70px;
+            min-height:60px;
             box-shadow:none;
+            line-height:1.1;
         ">{safe_label}</button>
         <script>
         const button = document.getElementById({json.dumps(button_id)});
@@ -36,5 +37,5 @@ def render_copy_button(label: str, value: str) -> None:
         }});
         </script>
         """,
-        height=56,
+        height=82,
     )

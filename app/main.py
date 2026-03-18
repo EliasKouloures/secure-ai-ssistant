@@ -144,45 +144,40 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    left_col, middle_col, right_col = st.columns([1.05, 3.4, 1.45], gap="large")
+    left_col, middle_col, right_col = st.columns([1.0, 3.15, 1.3], gap="large")
 
     with left_col:
-        st.markdown('<div class="ssa-panel ssa-history-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="ssa-panel-title">History</div>', unsafe_allow_html=True)
-        history_items = service.list_history(limit=18)
-        if not history_items:
-            st.markdown(
-                '<p class="ssa-muted">Past chats will appear here once you have run a prompt.</p>',
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown('<div class="ssa-history-list">', unsafe_allow_html=True)
-            for item in history_items:
-                if st.button(
-                    _history_button_label(item),
-                    key=f"history_{item.id}",
-                    width="stretch",
-                    help=item.preview,
-                ):
-                    _load_history_into_state(service, item)
-                    st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('<div class="ssa-section-title">History</div>', unsafe_allow_html=True)
+        with st.container(border=True, height=760):
+            history_items = service.list_history(limit=18)
+            if not history_items:
+                st.markdown(
+                    '<p class="ssa-muted">Past chats will appear here once you have run a prompt.</p>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                for item in history_items:
+                    if st.button(
+                        _history_button_label(item),
+                        key=f"history_{item.id}",
+                        width="stretch",
+                        help=item.preview,
+                    ):
+                        _load_history_into_state(service, item)
+                        st.rerun()
 
     with middle_col:
-        st.markdown('<div class="ssa-panel ssa-main-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="ssa-panel-title">Context, Info & 2do\'s</div>', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-section-title">Context, Info & 2do\'s</div>', unsafe_allow_html=True)
         context_text = st.text_area(
             "Context, Info & 2do's",
             key="context_input",
-            height=240,
+            height=180,
             label_visibility="collapsed",
             placeholder="Type or paste the details for this task here.",
         )
 
-        action_left, action_right = st.columns(2, gap="large")
+        action_left, action_right = st.columns(2, gap="medium")
         with action_left:
-            st.markdown('<div class="ssa-upload-field">', unsafe_allow_html=True)
             uploaded_file = st.file_uploader(
                 "Upload File",
                 type=["pdf", "png", "jpg", "jpeg"],
@@ -190,7 +185,6 @@ def main() -> None:
                 key=f"workspace_file_{st.session_state.file_uploader_nonce}",
                 label_visibility="collapsed",
             )
-            st.markdown("</div>", unsafe_allow_html=True)
         with action_right:
             run_prompt = st.button("Run Prompt", type="primary", width="stretch")
 
@@ -225,17 +219,17 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
 
-        st.markdown('<div class="ssa-panel-title ssa-panel-title-output">AI Output</div>', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-section-title ssa-section-title-output">AI Output</div>', unsafe_allow_html=True)
         output_text = st.text_area(
             "AI Output",
             key="output_editor_input",
-            height=320,
+            height=250,
             label_visibility="collapsed",
             placeholder="The local model output will appear here.",
         )
         st.session_state.output_text = output_text
 
-        output_left, output_right = st.columns(2, gap="large")
+        output_left, output_right = st.columns(2, gap="medium")
         with output_left:
             if st.button("Delete Output", width="stretch"):
                 st.session_state.pending_output_sync = ""
@@ -245,11 +239,8 @@ def main() -> None:
         with output_right:
             render_copy_button("Copy Output", output_text)
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
     with right_col:
-        st.markdown('<div class="ssa-panel ssa-prompt-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="ssa-panel-title">Prompts</div>', unsafe_allow_html=True)
+        st.markdown('<div class="ssa-section-title">Prompts</div>', unsafe_allow_html=True)
         choice = st.selectbox(
             "Prompts",
             options=prompt_options,
@@ -266,7 +257,7 @@ def main() -> None:
         prompt_body = st.text_area(
             "Selected Prompt",
             key="prompt_editor_input",
-            height=660,
+            height=520,
             label_visibility="collapsed",
             placeholder="Select a prompt from the menu above, or choose Add new Prompt and write one here.",
         )
@@ -280,7 +271,6 @@ def main() -> None:
             st.session_state.flash_message = f"Prompt saved: {saved_prompt.title}"
             st.session_state.error_message = None
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

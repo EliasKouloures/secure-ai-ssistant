@@ -58,8 +58,8 @@ def load_styles() -> str:
 
     .block-container {
         max-width: 1760px;
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
+        padding-top: 0.55rem;
+        padding-bottom: 1.4rem;
     }
 
     h1, h2, h3, p, label, span, div {
@@ -69,9 +69,9 @@ def load_styles() -> str:
 
     .ssa-topbar {
         border: 2px solid var(--ssa-border);
-        border-radius: 34px;
-        padding: 30px 46px;
-        margin-bottom: 30px;
+        border-radius: 28px;
+        padding: 20px 34px;
+        margin-bottom: 18px;
         background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 244, 249, 0.82)),
             linear-gradient(90deg, rgba(112, 128, 144, 0.08) 1px, transparent 1px),
@@ -83,68 +83,46 @@ def load_styles() -> str:
         display: flex;
         align-items: baseline;
         justify-content: center;
-        gap: 18px;
+        gap: 14px;
         flex-wrap: wrap;
     }
 
     .ssa-brand {
-        font-size: 58px;
+        font-size: 44px;
         font-weight: 700;
         letter-spacing: -0.04em;
     }
 
     .ssa-claim {
-        font-size: 42px;
+        font-size: 28px;
         font-weight: 400;
         letter-spacing: -0.03em;
     }
 
-    .ssa-panel {
-        border: 2px solid var(--ssa-border);
-        border-radius: 30px;
-        padding: 24px 20px 20px;
-        background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 244, 249, 0.78)),
-            radial-gradient(circle at top right, rgba(212, 175, 55, 0.05), transparent 32%);
-        backdrop-filter: blur(16px);
-        min-height: 100%;
-    }
-
-    .ssa-history-panel {
-        min-height: 1040px;
-    }
-
-    .ssa-main-panel {
-        min-height: 1040px;
-    }
-
-    .ssa-prompt-panel {
-        min-height: 1040px;
-    }
-
-    .ssa-panel-title {
-        font-size: 32px;
+    .ssa-section-title {
+        font-size: 24px;
         font-weight: 700;
         letter-spacing: -0.03em;
-        margin-bottom: 18px;
+        margin: 0 0 10px 0;
     }
 
-    .ssa-panel-title-output {
-        margin-top: 22px;
+    .ssa-section-title-output {
+        margin-top: 14px;
     }
 
     .ssa-muted {
         color: var(--ssa-slate);
-        font-size: 18px;
+        font-size: 16px;
+        margin: 0;
     }
 
     .ssa-message,
     .ssa-error {
-        border-radius: 20px;
-        padding: 14px 16px;
-        margin: 14px 0 8px;
+        border-radius: 16px;
+        padding: 12px 14px;
+        margin: 10px 0 8px;
         border: 1px solid var(--ssa-soft-border);
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .ssa-message {
@@ -159,25 +137,35 @@ def load_styles() -> str:
 
     [data-testid="stWidgetLabel"] p {
         color: var(--ssa-navy) !important;
-        font-size: 18px !important;
+        font-size: 16px !important;
         font-weight: 600 !important;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 24px !important;
+        border: 2px solid rgba(10, 25, 47, 0.82) !important;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 244, 249, 0.82)),
+            radial-gradient(circle at top right, rgba(212, 175, 55, 0.04), transparent 32%) !important;
+        box-shadow: none !important;
+        padding: 12px !important;
     }
 
     .stTextArea textarea,
     .stSelectbox div[data-baseweb="select"] > div,
     .stTextInput input {
-        border-radius: 24px !important;
-        border: 1.5px solid rgba(10, 25, 47, 0.26) !important;
+        border-radius: 22px !important;
+        border: 2px solid rgba(10, 25, 47, 0.78) !important;
         background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 249, 0.94)) !important;
         color: var(--ssa-navy) !important;
         box-shadow: none !important;
-        font-size: 20px !important;
+        font-size: 17px !important;
     }
 
     .stTextArea textarea {
-        padding: 18px !important;
-        line-height: 1.5 !important;
+        padding: 14px 16px !important;
+        line-height: 1.45 !important;
     }
 
     .stTextArea textarea::placeholder,
@@ -186,8 +174,8 @@ def load_styles() -> str:
     }
 
     .stButton > button {
-        min-height: 70px;
-        border-radius: 24px;
+        min-height: 60px;
+        border-radius: 22px;
         border: 2px solid var(--ssa-border);
         background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 244, 249, 0.9));
@@ -196,6 +184,7 @@ def load_styles() -> str:
         font-size: 22px;
         font-weight: 700;
         letter-spacing: -0.02em;
+        padding: 0 18px;
     }
 
     .stButton > button:hover {
@@ -203,51 +192,71 @@ def load_styles() -> str:
         color: var(--ssa-blue);
     }
 
-    .stButton > button[kind="primary"] {
+    .stButton > button p {
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        color: var(--ssa-navy) !important;
+    }
+
+    .stButton > button[kind="primary"],
+    .stButton > button[kind="primary"]:hover {
         background: linear-gradient(180deg, rgba(0, 51, 153, 0.98), rgba(10, 25, 47, 0.98));
-        color: white;
+        color: white !important;
         border-color: rgba(0, 51, 153, 0.98);
     }
 
-    .ssa-history-list .stButton > button {
-        min-height: 52px;
-        font-size: 18px;
+    .stButton > button[kind="primary"] p,
+    .stButton > button[kind="primary"]:hover p {
+        color: rgba(244, 244, 249, 0.98) !important;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"] .stButton > button {
+        min-height: 48px;
+        font-size: 17px;
         font-weight: 600;
         justify-content: flex-start;
-        padding-left: 14px;
-        margin-bottom: 10px;
+        padding-left: 12px;
+        margin-bottom: 8px;
     }
 
-    .ssa-history-list .stButton > button p {
+    [data-testid="stVerticalBlockBorderWrapper"] .stButton > button p {
         text-align: left;
         white-space: normal;
+        font-size: 17px !important;
     }
 
-    .ssa-upload-field [data-testid="stFileUploaderDropzone"] {
-        min-height: 70px;
-        border-radius: 24px !important;
+    [data-testid="stFileUploaderDropzone"] {
+        min-height: 60px;
+        border-radius: 22px !important;
         border: 2px solid var(--ssa-border) !important;
         background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 244, 249, 0.9)) !important;
-        padding: 0.4rem 0.8rem !important;
+        padding: 0 !important;
+        position: relative;
+        overflow: hidden !important;
     }
 
-    .ssa-upload-field [data-testid="stFileUploaderDropzoneInstructions"] {
+    [data-testid="stFileUploaderDropzoneInstructions"],
+    [data-testid="stFileUploader"] small,
+    [data-testid="stFileUploader"] svg {
         display: none !important;
     }
 
-    .ssa-upload-field [data-testid="stFileUploaderDropzone"] button {
+    [data-testid="stFileUploaderDropzone"] button {
         width: 100%;
-        min-height: 54px;
-        border-radius: 18px !important;
+        min-height: 58px;
+        border-radius: 20px !important;
         border: 0 !important;
         background: transparent !important;
         color: transparent !important;
         box-shadow: none !important;
         position: relative;
+        font-size: 0 !important;
+        padding: 0 !important;
     }
 
-    .ssa-upload-field [data-testid="stFileUploaderDropzone"] button::after {
+    [data-testid="stFileUploaderDropzone"] button::after {
         content: "Upload File";
         position: absolute;
         inset: 0;
@@ -260,28 +269,53 @@ def load_styles() -> str:
         letter-spacing: -0.02em;
     }
 
-    .ssa-upload-field small {
-        display: none !important;
+    [data-testid="stFileUploaderDropzone"] p,
+    [data-testid="stFileUploaderDropzone"] span {
+        color: transparent !important;
+        font-size: 0 !important;
     }
 
     .stSelectbox div[data-baseweb="select"] > div {
-        min-height: 72px;
-        font-size: 22px !important;
+        min-height: 62px;
+        font-size: 18px !important;
         font-weight: 700;
         letter-spacing: -0.02em;
     }
 
+    div[data-baseweb="popover"],
+    div[data-baseweb="menu"],
+    ul[role="listbox"] {
+        background: rgba(255, 255, 255, 0.98) !important;
+        color: var(--ssa-navy) !important;
+        border: 1.5px solid rgba(10, 25, 47, 0.22) !important;
+        border-radius: 20px !important;
+        box-shadow: none !important;
+    }
+
+    li[role="option"],
+    div[role="option"] {
+        background: rgba(255, 255, 255, 0.98) !important;
+        color: var(--ssa-navy) !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+    }
+
+    li[role="option"]:hover,
+    div[role="option"]:hover {
+        background: rgba(0, 51, 153, 0.08) !important;
+    }
+
     iframe[title^="components.html"] {
-        border-radius: 24px;
+        border-radius: 22px;
     }
 
     @media (max-width: 1400px) {
         .ssa-brand {
-            font-size: 48px;
+            font-size: 38px;
         }
 
         .ssa-claim {
-            font-size: 34px;
+            font-size: 24px;
         }
     }
     </style>
